@@ -1,0 +1,22 @@
+{
+  "name": "eos-oracles",
+  "version": "0.0.1",
+  "description": "Generic EOSIC project",
+  "tests": "./test",
+  "migrations": "./migrate",
+  "contracts": {
+    "masteroracle": {
+      "name": "masteroracle",
+      "version": "0.0.1.1",
+      "description": "Master Oracle Contract",
+      "entry": "masteroracle.cpp",
+      "checksum": "7eac72556c849f2fe813345c7eb4d4df"
+    },
+    "priceoraclize": {
+      "name": "priceoraclize",
+      "version": "0.0.1.1",
+      "description": "Generic EOS contract",
+      "entry": "priceoraclize.cpp"
+    }
+  }
+}

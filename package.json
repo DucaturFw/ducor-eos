@@ -1,0 +1,19 @@
+{
+  "name": "eos-oracles",
+  "version": "0.0.1",
+  "description": "Generic EOSIC project",
+  "scripts": {
+    "test": "eosic test",
+    "compile": "eosic compile",
+    "migrate": "eosic migrate"
+  },
+  "dependencies": {
+    "binaryen": "37.0.0",
+    "eosjs": "14.0.0"
+  },
+  "devDependencies": {
+    "chai": "4.1.2",
+    "eosic": "DucaturFw/eosic",
+    "mocha": "5.2.0"
+  }
+}
