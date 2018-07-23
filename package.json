@@ -5,15 +5,16 @@
   "scripts": {
     "test": "eosic test",
     "compile": "eosic compile",
-    "migrate": "eosic migrate"
+    "migrate": "eosic migrate",
+    "start": "eosic start"
   },
   "dependencies": {
     "binaryen": "37.0.0",
-    "eosjs": "14.0.0"
+    "eosjs": "^15.0.6"
   },
   "devDependencies": {
     "chai": "4.1.2",
-    "eosic": "DucaturFw/eosic",
+    "eosic": "DucaturFw/eosic#develop",
     "mocha": "5.2.0"
   }
 }
