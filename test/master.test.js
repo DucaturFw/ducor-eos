@@ -17,6 +17,62 @@ const eos = Eos({
   keyProvider: wif
 });
 
+const require_permissions = ({ account, key, actor, parent }) => {
+  return {
+    account: `${account}`,
+    permission: "active",
+    parent: `${parent}`,
+    auth: {
+      threshold: 1,
+      keys: [
+        {
+          key: `${key}`,
+          weight: 1
+        }
+      ],
+      accounts: [
+        {
+          permission: {
+            actor: `${actor}`,
+            permission: "eosio.code"
+          },
+          weight: 1
+        }
+      ],
+      waits: []
+    }
+  };
+};
+
+const allowContract = (auth, key, contract, parent) => {
+  let [account, permission] = auth.split("@");
+  permission = permission || "active";
+  parent = parent || "owner";
+
+  const tx_data = {
+    actions: [
+      {
+        account: "eosio",
+        name: "updateauth",
+        authorization: [
+          {
+            actor: account,
+            permission: permission
+          }
+        ],
+        data: require_permissions({
+          account: account,
+          key: key,
+          actor: contract,
+          parent: parent
+        })
+      }
+    ]
+  };
+
+  return tx_data;
+};
+
 describe("exchange", () => {
   let masterAccount, masterContract;
   let oraclizeAccount, oraclizeContract;
@@ -32,31 +88,31 @@ describe("exchange", () => {
     } = await eosic.createContract(pub, eos, "priceoraclize"));
   });
 
-  it("allow ask for data", async () => {
-    const r = await masterContract.ask("eosio", "0x100", {
-      authorization: ["eosio"]
-    });
-  });
+  // it("allow ask for data", async () => {
+  //   const r = await masterContract.ask("eosio", "0x100", {
+  //     authorization: ["eosio"]
+  //   });
+  // });
 
-  it("create request for unique ask", async () => {
-    await masterContract.ask("eosio", "0x100", {
-      authorization: ["eosio"]
-    });
+  // it("create request for unique ask", async () => {
+  //   await masterContract.ask("eosio", "0x100", {
+  //     authorization: ["eosio"]
+  //   });
 
-    const rows = await eos.getTableRows({
-      code: masterAccount,
-      scope: masterAccount,
-      table: "request",
-      json: true,
-      limit: 999
-    });
+  //   const rows = await eos.getTableRows({
+  //     code: masterAccount,
+  //     scope: masterAccount,
+  //     table: "request",
+  //     json: true,
+  //     limit: 999
+  //   });
 
-    console.log(rows);
-  });
+  //   console.log(rows);
+  // });
 
   it("push data", async () => {
-    await masterContract.ask("eosio", "0x100", {
-      authorization: ["eosio"]
+    await masterContract.ask(oraclizeAccount, "0x100", {
+      authorization: ["eosio", oraclizeAccount]
     });
 
     const definitions = {
@@ -73,33 +129,18 @@ describe("exchange", () => {
       ByteBuffer.BIG_ENDIAN
     );
 
-    b.writeUint64(format.encodeName("eosio"));
-
-    console.log(Buffer.from("0x100").toString("hex"));
-
+    b.writeUint64(format.encodeName(oraclizeAccount));
     const buffer = ByteBuffer.concat([
       b.copy(0, b.offset),
       Buffer.from("0x100")
     ]);
 
-    console.log("BUFFER " + buffer.toString("hex"));
+    await eos.transaction(allowContract("eosio", pub, masterAccount));
 
-    console.log("HASH: " + ecc.sha256(buffer.toBuffer()).toString("hex"));
+    const hash = ecc.sha256(buffer.toBuffer());
 
-    // console.log(fcbuffer.errors.length === 0, fcbuffer.errors);
-    // const { requestHash } = fcbuffer.structs;
-    // console.log(
-    //   "HASH: " +
-    //     ecc
-    //       .sha256(
-    //         fcbuffer.toBuffer(requestHash, {
-    //           acc: oraclizeAccount,
-    //           task: "0x100"
-    //         })
-    //       )
-    //       .toString("hex")
-    // );
-
-    // await masterContract.push()
+    const tx = await masterContract.pushdata("eosio", hash, "hello world", {
+      authorization: ["eosio", masterAccount]
+    });
   });
 });

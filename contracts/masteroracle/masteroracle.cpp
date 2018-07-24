@@ -2,6 +2,7 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/time.hpp>
 #include <eosiolib/crypto.h>
+#include <eosiolib/print.h>
 #include "masteroracle.hpp"
 
 using namespace eosio;
@@ -35,9 +36,9 @@ struct requestHash
     memcpy(buffer, &contract, 8);
     memcpy(buffer + 8, task.data(), tasklen);
     sha256(buffer, tasklen + 8, &result);
-    // eosio::print("\n contract: ", contract);
-    // eosio::print((std::string("\n") + hexStr(buffer, tasklen + 8)).c_str());
-    // eosio::print((std::string("\n") + hexStr((const char *)&result.hash[0], 32)).c_str());
+    eosio::print("\n contract: ", contract);
+    eosio::print((std::string("\n") + hexStr(buffer, tasklen + 8)).c_str());
+    eosio::print((std::string("\n") + hexStr((const char *)&result.hash[0], 32)).c_str());
     return result;
   }
 };
@@ -95,21 +96,29 @@ public:
   }
 
   // @abi action
-  void push(checksum256 hash, std::string data)
+  void pushdata(account_name sender, checksum256 hash, std::string data)
   {
     uint64_t hash_id = request::pack_hash(hash);
     auto itt = requests.find(hash_id);
     eosio_assert(itt != requests.end(), "Request not found");
-
     request request_data = requests.get(hash_id);
 
+    eosio::print("\n");
+    printn(request_data.contract);
+    eosio::print("\n");
+    printn(_self);
+    eosio::print("\n");
+    printn(sender);
+    eosio::print("\n");
+
+    // SEND_INLINE_ACTION()
     action(
-        permission_level{_self, N(oraclize)},
+        permission_level{sender, N(active)},
         request_data.contract, N(oraclized),
         std::make_tuple(hash, data))
         .send();
   }
 };
 
-EOSIO_ABI(masteroracle, (ask)(push))
+EOSIO_ABI(masteroracle, (ask)(pushdata))
 }
