@@ -42,11 +42,10 @@ public:
   }
 
   /// @abi action
-  void oraclized(checksum256 hash, std::string data)
+  void oraclized(uint64_t one, uint64_t two)
   {
-    // eosio_assert(m_master_contract != N(null), "setup contract before interaction");
-    // require_auth(m_master_contract);
-    print(data);
+    print("\none: ", one);
+    print("\ntwo: ", two);
   }
 };
 

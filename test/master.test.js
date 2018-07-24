@@ -73,6 +73,10 @@ const allowContract = (auth, key, contract, parent) => {
   return tx_data;
 };
 
+function createBuffer() {
+  return new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.BIG_ENDIAN);
+}
+
 describe("exchange", () => {
   let masterAccount, masterContract;
   let oraclizeAccount, oraclizeContract;
@@ -89,13 +93,13 @@ describe("exchange", () => {
   });
 
   // it("allow ask for data", async () => {
-  //   const r = await masterContract.ask("eosio", "0x100", {
+  //   const r = await masterContract.ask({ contract: oraclizeAccount, task: "0x100" }, {
   //     authorization: ["eosio"]
   //   });
   // });
 
   // it("create request for unique ask", async () => {
-  //   await masterContract.ask("eosio", "0x100", {
+  //   await masterContract.ask({ contract: oraclizeAccount, task: "0x100" }, {
   //     authorization: ["eosio"]
   //   });
 
@@ -111,9 +115,15 @@ describe("exchange", () => {
   // });
 
   it("push data", async () => {
-    await masterContract.ask(oraclizeAccount, "0x100", {
-      authorization: ["eosio", oraclizeAccount]
-    });
+    console.log(masterContract.fc);
+    await masterContract.ask(
+      JSON.stringify({ contract: oraclizeAccount, task: "0x100" }),
+      // oraclizeAccount,
+      // "0x100",
+      {
+        authorization: ["eosio", oraclizeAccount]
+      }
+    );
 
     const definitions = {
       requestHash: {
@@ -135,12 +145,31 @@ describe("exchange", () => {
       Buffer.from("0x100")
     ]);
 
+    const dataBuffer = ByteBuffer.concat([
+      // stop
+      createBuffer()
+        .writeByte(1)
+        .copy(0, 1),
+      // data
+      createBuffer()
+        .writeUint64(255)
+        .copy(0, 8),
+      createBuffer()
+        .writeUint64(15)
+        .copy(0, 8)
+    ]);
+
     await eos.transaction(allowContract("eosio", pub, masterAccount));
 
     const hash = ecc.sha256(buffer.toBuffer());
 
-    const tx = await masterContract.pushdata("eosio", hash, "hello world", {
-      authorization: ["eosio", masterAccount]
-    });
+    const tx = await masterContract.pushdata(
+      "eosio",
+      hash,
+      dataBuffer.toBuffer(),
+      {
+        authorization: ["eosio", masterAccount]
+      }
+    );
   });
 });

@@ -70,7 +70,25 @@ struct request
   EOSLIB_SERIALIZE(request, (task)(contract)(timestamp))
 };
 
-typedef multi_index<N(request), request> request_table;
+struct ask_payload
+{
+  account_name contract;
+  std::string task;
+
+  EOSLIB_SERIALIZE(ask_payload, (contract)(task))
+};
+
+struct push_payload
+{
+  account_name sender;
+  checksum256 hash;
+  std::string data;
+
+  EOSLIB_SERIALIZE(push_payload, (sender)(hash)(data))
+};
+
+typedef multi_index<N(request), request>
+    request_table;
 
 class masteroracle : public eosio::contract
 {
@@ -83,8 +101,12 @@ public:
   masteroracle(account_name s) : contract(s), requests(_self, _self), token(N(ducaturtoken)) {}
 
   // @abi action
-  void ask(account_name contract, std::string task)
+  void ask(ask_payload ask)
+
   {
+    account_name contract = ask.contract;
+    std::string task = ask.task;
+
     require_auth(contract);
     auto itt = requests.find(request::get_hash(task, contract));
     eosio_assert(itt == requests.end(), "Already known request");
@@ -96,13 +118,19 @@ public:
   }
 
   // @abi action
-  void pushdata(account_name sender, checksum256 hash, std::string data)
+  void push(push_payload push)
   {
+    account_name sender = push.sender;
+    checksum256 hash = push.hash;
+    void *data = &push.data;
+
     uint64_t hash_id = request::pack_hash(hash);
     auto itt = requests.find(hash_id);
     eosio_assert(itt != requests.end(), "Request not found");
     request request_data = requests.get(hash_id);
 
+    // eosio::print("\n");
+    // eosio::print((std::string("data: ") + data).c_str());
     eosio::print("\n");
     printn(request_data.contract);
     eosio::print("\n");
@@ -115,10 +143,50 @@ public:
     action(
         permission_level{sender, N(active)},
         request_data.contract, N(oraclized),
-        std::make_tuple(hash, data))
+        std::make_tuple(data))
         .send();
   }
 };
+}
 
-EOSIO_ABI(masteroracle, (ask)(pushdata))
+extern "C" {
+
+/// The apply method implements the dispatch of events to this contract
+void apply(uint64_t receiver, uint64_t code, uint64_t action)
+{
+  account_name self = receiver;
+
+  if (code == self)
+  {
+    auto contract = ducatur::masteroracle(self);
+
+    if (action == N(ask))
+    {
+      // execute ask
+      contract.ask(unpack_action_data<ducatur::ask_payload>());
+    }
+    if (action == N(push))
+    {
+      contract.push(unpack_action_data<ducatur::push_payload>());
+    }
+    // if (code == N(eosio) && action == N(onerror))
+    // {
+    //   apply_onerror(receiver, onerror::from_current_action());
+    // }
+    // else if (code == N(eosio.token))
+    // {
+    //   if (action == N(transfer))
+    //   {
+    //     apply_transfer(receiver, code, unpack_action_data<eosio::token::transfer_args>());
+    //   }
+    // }
+    // else if (code == receiver)
+    // {
+    //   if (action == N(setowner))
+    //   {
+    //     apply_setowner(receiver, unpack_action_data<set_owner>());
+    //   }
+    // }
+  }
+}
 }
