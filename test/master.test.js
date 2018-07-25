@@ -73,11 +73,22 @@ const allowContract = (auth, key, contract, parent) => {
   return tx_data;
 };
 
+async function expectAssert(promise) {
+  try {
+    await promise;
+    assert.fail("Expected revert not received");
+  } catch (error) {
+    console.log(error);
+    const revertFound = error.search("eosio_assert_message_exception") >= 0;
+    assert(revertFound, `Expected "revert", got ${error} instead`);
+  }
+}
+
 describe("exchange", () => {
   let masterAccount, masterContract;
   let oraclizeAccount, oraclizeContract;
 
-  beforeEach(async () => {
+  before(async () => {
     ({
       account: masterAccount,
       contract: masterContract
@@ -88,48 +99,28 @@ describe("exchange", () => {
     } = await eosic.createContract(pub, eos, "priceoraclize"));
   });
 
-  // it("allow ask for data", async () => {
-  //   const r = await masterContract.ask("eosio", "0x100", {
-  //     authorization: ["eosio"]
-  //   });
-  // });
-
-  // it("create request for unique ask", async () => {
-  //   await masterContract.ask("eosio", "0x100", {
-  //     authorization: ["eosio"]
-  //   });
-
-  //   const rows = await eos.getTableRows({
-  //     code: masterAccount,
-  //     scope: masterAccount,
-  //     table: "request",
-  //     json: true,
-  //     limit: 999
-  //   });
-
-  //   console.log(rows);
-  // });
-
-  it("push data", async () => {
+  it("ask", async () => {
     await masterContract.ask(oraclizeAccount, "0x100", {
       authorization: ["eosio", oraclizeAccount]
     });
+  });
 
-    const definitions = {
-      requestHash: {
-        fields: {
-          acc: "account_name",
-          task: "string"
-        }
-      }
-    };
+  it("reject sell", async () => {
+    await expectAssert(
+      oraclizeContract.sell("eosio", 1, {
+        authorization: ["eosio"]
+      })
+    );
+  });
 
+  it("push data", async () => {
     const b = new ByteBuffer(
       ByteBuffer.DEFAULT_CAPACITY,
       ByteBuffer.BIG_ENDIAN
     );
 
     b.writeUint64(format.encodeName(oraclizeAccount));
+
     const buffer = ByteBuffer.concat([
       b.copy(0, b.offset),
       Buffer.from("0x100")
@@ -139,8 +130,14 @@ describe("exchange", () => {
 
     const hash = ecc.sha256(buffer.toBuffer());
 
-    const tx = await masterContract.pushdata("eosio", hash, "hello world", {
+    const tx = await masterContract.pushdata("eosio", hash, 840000, 2, {
       authorization: ["eosio", masterAccount]
+    });
+  });
+
+  it("sell", async () => {
+    await oraclizeContract.sell("eosio", 1, {
+      authorization: ["eosio"]
     });
   });
 });

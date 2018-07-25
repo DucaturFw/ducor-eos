@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Generic EOSIC project",
   "scripts": {
-    "test": "eosic test",
+    "test": "yarn compile && eosic test",
     "compile": "eosic compile",
     "migrate": "eosic migrate",
     "start": "eosic start"

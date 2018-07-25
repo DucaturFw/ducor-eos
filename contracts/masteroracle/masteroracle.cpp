@@ -85,7 +85,6 @@ public:
   // @abi action
   void ask(account_name contract, std::string task)
   {
-    require_auth(contract);
     auto itt = requests.find(request::get_hash(task, contract));
     eosio_assert(itt == requests.end(), "Already known request");
     requests.emplace(contract, [&](request &r) {
@@ -96,7 +95,7 @@ public:
   }
 
   // @abi action
-  void pushdata(account_name sender, checksum256 hash, std::string data)
+  void pushdata(account_name sender, checksum256 hash, uint64_t price, uint8_t decimals)
   {
     uint64_t hash_id = request::pack_hash(hash);
     auto itt = requests.find(hash_id);
@@ -115,7 +114,7 @@ public:
     action(
         permission_level{sender, N(active)},
         request_data.contract, N(oraclized),
-        std::make_tuple(hash, data))
+        std::make_tuple(sender, hash, price, decimals))
         .send();
   }
 };
