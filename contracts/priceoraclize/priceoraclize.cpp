@@ -1,52 +1,30 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/singleton.hpp>
-#include <eosiolib/time.hpp>
+#include "oraclized.hpp"
 #include "priceoraclize.hpp"
 
 using namespace eosio;
 
-struct pricedata
-{
-  uint32_t best_before;
-  uint32_t update_after;
-  uint64_t price;
-  uint8_t decimals;
-
-  EOSLIB_SERIALIZE(pricedata, (best_before)(update_after)(price)(decimals))
-};
+typedef oraclized<N(btcusd), 86400, 3600, uint64_t> btcusd_data;
+typedef oraclized<N(eosusd), 86400, 3600, uint64_t> eosusd_data;
+typedef oraclized<N(latest.hash), 86400, 3600, std::string> latest_hash_data;
 
 typedef singleton<N(master), account_name> oraclize_master;
-typedef singleton<N(btcusd), pricedata> price_btcusd;
 
 class priceoraclize : public eosio::contract
 {
 private:
-  pricedata btcusd;
+  btcusd_data btcusd;
+  eosusd_data eosusd;
+  latest_hash_data latest_hash;
+
   account_name master;
-
-  void price_assert(pricedata price)
-  {
-    eosio_assert(price.best_before > now(), "data is outdated");
-  }
-
-  uint64_t pow(uint64_t a, uint8_t b)
-  {
-    uint64_t r = 1;
-    while (b > 0)
-    {
-      r = r * a;
-      b--;
-    }
-
-    return r;
-  }
 
 public:
   using contract::contract;
 
-  priceoraclize(account_name s) : contract(s)
+  priceoraclize(account_name s) : contract(s), btcusd(_self, _self), eosusd(_self, _self), latest_hash(_self, _self)
   {
-    btcusd = price_btcusd(_self, _self).get_or_create(_self);
     master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
   }
 
@@ -62,29 +40,35 @@ public:
   // @abi action
   void sell(account_name buyer, uint64_t amount)
   {
-    price_assert(btcusd);
-
-    eosio::print("\n cost: ", btcusd.price);
-    eosio::print("\n price: ", amount * btcusd.price / pow(10, btcusd.decimals));
+    eosio_assert(btcusd.fresh(), "btcusd data is out dated.");
+    eosio_assert(eosusd.fresh(), "eosusd data is out dated.");
+    eosio::print("\n");
+    eosio::print("\n btc: ", amount * btcusd.value());
+    eosio::print("\n eos: ", amount * eosusd.value());
   }
 
   // @abi action
-  void oraclized(account_name oracle, checksum256 data_id, uint64_t price, uint8_t decimals)
+  void pushuint(account_name oracle, std::string data_id, uint64_t data)
   {
-    eosio::print("\n");
-    printn(oracle);
-    eosio::print("\n");
-    printn(master);
-    eosio_assert(master != N(undefined), "contract isn't setupped");
-    // require_auth(master);
-    // require_auth(oracle);
+    if (strcmp(data_id.c_str(), "0x100") == 0)
+    {
+      btcusd.set(data, oracle);
+    }
 
-    price_btcusd(_self, _self)
-        .set(pricedata{now() + 60 * 60 * 24, // 24 hours
-                       now() + 60 * 5,       // 5 minutes
-                       price, decimals},
-             oracle);
+    if (strcmp(data_id.c_str(), "0x101") == 0)
+    {
+      eosusd.set(data, oracle);
+    }
+  }
+
+  // @abi action
+  void pushstr(account_name oracle, std::string data_id, std::string data)
+  {
+    if (strcmp(data_id.c_str(), "0x102") == 0)
+    {
+      latest_hash.set(data, oracle);
+    }
   }
 };
 
-EOSIO_ABI(priceoraclize, (oraclized)(sell)(setup))
+EOSIO_ABI(priceoraclize, (sell)(setup)(pushuint)(pushstr))

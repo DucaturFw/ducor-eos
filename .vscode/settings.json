@@ -51,6 +51,13 @@
     "forward_list": "cpp",
     "string_view": "cpp",
     "valarray": "cpp",
-    "__string": "cpp"
+    "__string": "cpp",
+    "system_error": "cpp",
+    "chrono": "cpp",
+    "__memory": "cpp",
+    "limits": "cpp",
+    "ratio": "cpp",
+    "scoped_allocator": "cpp",
+    "type_traits": "cpp"
   }
 }

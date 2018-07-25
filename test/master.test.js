@@ -129,25 +129,20 @@ describe("exchange", () => {
       ByteBuffer.BIG_ENDIAN
     );
 
-    b.writeUint64(format.encodeName(oraclizeAccount));
-
-    const buffer = ByteBuffer.concat([
-      b.copy(0, b.offset),
-      Buffer.from("0x100")
-    ]);
-
     await eos.transaction(allowContract("eosio", pub, masterAccount));
 
-    const hash = ecc.sha256(buffer.toBuffer());
-
     console.log(oracle);
-    const tx = await oraclizeContract.oraclized(oracle, hash, 840000, 2, {
+    await oraclizeContract.pushuint(oracle, "0x100", 840000, {
+      authorization: [oracle]
+    });
+
+    await oraclizeContract.pushuint(oracle, "0x101", 500, {
       authorization: [oracle]
     });
   });
 
   it("sell", async () => {
-    await oraclizeContract.sell("eosio", 1, {
+    await oraclizeContract.sell("eosio", 5, {
       authorization: ["eosio"]
     });
   });
