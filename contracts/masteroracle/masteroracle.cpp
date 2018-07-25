@@ -93,31 +93,7 @@ public:
       r.timestamp = now();
     });
   }
-
-  // @abi action
-  void pushdata(account_name sender, checksum256 hash, uint64_t price, uint8_t decimals)
-  {
-    uint64_t hash_id = request::pack_hash(hash);
-    auto itt = requests.find(hash_id);
-    eosio_assert(itt != requests.end(), "Request not found");
-    request request_data = requests.get(hash_id);
-
-    eosio::print("\n");
-    printn(request_data.contract);
-    eosio::print("\n");
-    printn(_self);
-    eosio::print("\n");
-    printn(sender);
-    eosio::print("\n");
-
-    // SEND_INLINE_ACTION()
-    action(
-        permission_level{sender, N(active)},
-        request_data.contract, N(oraclized),
-        std::make_tuple(sender, hash, price, decimals))
-        .send();
-  }
 };
 
-EOSIO_ABI(masteroracle, (ask)(pushdata))
+EOSIO_ABI(masteroracle, (ask))
 }

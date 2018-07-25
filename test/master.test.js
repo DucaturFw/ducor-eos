@@ -87,6 +87,7 @@ async function expectAssert(promise) {
 describe("exchange", () => {
   let masterAccount, masterContract;
   let oraclizeAccount, oraclizeContract;
+  let oracle;
 
   before(async () => {
     ({
@@ -97,6 +98,15 @@ describe("exchange", () => {
       account: oraclizeAccount,
       contract: oraclizeContract
     } = await eosic.createContract(pub, eos, "priceoraclize"));
+
+    oracle = "oracle";
+    console.log(await eosic.createAccount(eos, pub, "oracle"));
+
+    console.log(
+      await oraclizeContract.setup(oracle, {
+        authorization: [oraclizeAccount]
+      })
+    );
   });
 
   it("ask", async () => {
@@ -130,8 +140,9 @@ describe("exchange", () => {
 
     const hash = ecc.sha256(buffer.toBuffer());
 
-    const tx = await masterContract.pushdata("eosio", hash, 840000, 2, {
-      authorization: ["eosio", masterAccount]
+    console.log(oracle);
+    const tx = await oraclizeContract.oraclized(oracle, hash, 840000, 2, {
+      authorization: [oracle]
     });
   });
 

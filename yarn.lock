@@ -702,7 +702,7 @@ end-of-stream@^1.0.0, end-of-stream@^1.1.0:
 
 eosic@DucaturFw/eosic#develop:
   version "0.0.2"
-  resolved "https://codeload.github.com/DucaturFw/eosic/tar.gz/e2b013dc09d602d75cd79087a4b5b768319f818c"
+  resolved "https://codeload.github.com/DucaturFw/eosic/tar.gz/0b15023390b34c991b7ecde73b6ff95c9005ead8"
   dependencies:
     "@oclif/command" "^1"
     "@oclif/config" "^1"

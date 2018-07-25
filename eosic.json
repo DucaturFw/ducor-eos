@@ -10,14 +10,14 @@
       "version": "0.0.1.1",
       "description": "Master Oracle Contract",
       "entry": "masteroracle.cpp",
-      "checksum": "7affd6c899e98abf3ee59695feac8ebf"
+      "checksum": "15dc13ff9b3f07dfbdc3b3e0fb0af86b"
     },
     "priceoraclize": {
       "name": "priceoraclize",
       "version": "0.0.1.1",
       "description": "Generic EOS contract",
       "entry": "priceoraclize.cpp",
-      "checksum": "40d8254515557d77ac483199d123ccae"
+      "checksum": "2e12209026a101820f42c591b1888dd7"
     },
     "hello": {
       "name": "hello",
