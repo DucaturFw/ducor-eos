@@ -9,12 +9,15 @@
     "start": "eosic start"
   },
   "dependencies": {
+    "@types/dot": "^1.1.2",
     "binaryen": "37.0.0",
-    "eosjs": "^15.0.6"
+    "dot": "^1.1.2",
+    "eosjs": "^15.0.6",
+    "eosic": "DucaturFw/eosic#develop",
+    "typescript": "^2.9.2"
   },
   "devDependencies": {
     "chai": "4.1.2",
-    "eosic": "DucaturFw/eosic#develop",
     "mocha": "5.2.0"
   }
 }

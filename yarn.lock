@@ -70,6 +70,10 @@
     "@types/events" "*"
     "@types/node" "*"
 
+"@types/dot@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@types/dot/-/dot-1.1.2.tgz#dd9f794c74f4e26076273e45f55b8b036f3aaf5d"
+
 "@types/events@*":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
@@ -680,6 +684,10 @@ dockerode@^2.5.5:
     concat-stream "~1.5.1"
     docker-modem "^1.0.0"
     tar-fs "~1.12.0"
+
+dot@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/dot/-/dot-1.1.2.tgz#c7377019fc4e550798928b2b9afeb66abfa1f2f9"
 
 ecurve@^1.0.5:
   version "1.0.6"
@@ -1889,6 +1897,10 @@ typedarray@~0.0.5:
 typescript@2.9.1:
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.1.tgz#fdb19d2c67a15d11995fd15640e373e09ab09961"
+
+typescript@^2.9.2:
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
 
 uglify-js@^2.6:
   version "2.8.29"
