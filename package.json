@@ -6,14 +6,16 @@
     "test": "yarn compile && eosic test",
     "compile": "eosic compile",
     "migrate": "eosic migrate",
-    "start": "eosic start"
+    "start": "eosic start",
+    "prepare": "ts-node generator/src/prepare.ts",
+    "generate": "ts-node generator/src/index.ts"
   },
   "dependencies": {
     "@types/dot": "^1.1.2",
-    "binaryen": "37.0.0",
     "dot": "^1.1.2",
-    "eosjs": "^15.0.6",
     "eosic": "DucaturFw/eosic#develop",
+    "eosjs": "^15.0.6",
+    "ts-node": "^7.0.0",
     "typescript": "^2.9.2"
   },
   "devDependencies": {
