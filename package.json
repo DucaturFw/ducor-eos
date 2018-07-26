@@ -7,19 +7,18 @@
     "compile": "eosic compile",
     "migrate": "eosic migrate",
     "start": "eosic start",
-    "prepare": "ts-node generator/src/prepare.ts",
-    "generate": "ts-node generator/src/index.ts"
+    "prepare": "tsc && node generator/lib/prepare.js",
+    "generate": "node generator/lib/index.js"
   },
   "dependencies": {
-    "@types/dot": "^1.1.2",
     "dot": "^1.1.2",
     "eosic": "DucaturFw/eosic#develop",
-    "eosjs": "^15.0.6",
-    "ts-node": "^7.0.0",
-    "typescript": "^2.9.2"
+    "eosjs": "^15.0.6"
   },
   "devDependencies": {
+    "@types/dot": "^1.1.2",
     "chai": "4.1.2",
-    "mocha": "5.2.0"
+    "mocha": "5.2.0",
+    "typescript": "^2.9.2"
   }
 }

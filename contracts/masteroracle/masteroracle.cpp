@@ -11,6 +11,7 @@ namespace ducatur
 {
 constexpr char hexmap[] = {'0', '1', '2', '3', '4', '5', '6', '7',
                            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
 std::string hexStr(const char *data, int len)
 {
   std::string s(len * 2, ' ');
@@ -36,9 +37,6 @@ struct requestHash
     memcpy(buffer, &contract, 8);
     memcpy(buffer + 8, task.data(), tasklen);
     sha256(buffer, tasklen + 8, &result);
-    eosio::print("\n contract: ", contract);
-    eosio::print((std::string("\n") + hexStr(buffer, tasklen + 8)).c_str());
-    eosio::print((std::string("\n") + hexStr((const char *)&result.hash[0], 32)).c_str());
     return result;
   }
 };
@@ -96,4 +94,4 @@ public:
 };
 
 EOSIO_ABI(masteroracle, (ask))
-}
+} // namespace ducatur

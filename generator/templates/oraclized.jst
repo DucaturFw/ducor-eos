@@ -24,10 +24,20 @@ public:
     master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
   }
 
-  void setup(account_name master)
+  void setup(account_name master, account_name registry)
   {
     require_auth(_self);
     oraclize_master(_self, _self).set(master, _self);
+    {{~ it.providers :p}}ask_data(registry, "{{= p.id }}");
+    {{~}}
+  }
+
+  void ask_data(account_name registry, std::string data)
+  {
+    action(permission_level{_self, N(active)},
+           registry, N(ask),
+           std::make_tuple(_self, data))
+        .send();
   }{{~ it.endpoint :e }}
   
   void push{{= e.suffix }}(account_name oracle, std::string data_id, {{= e.type }} data) 

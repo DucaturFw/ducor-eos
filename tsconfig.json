@@ -22,8 +22,9 @@
     "rootDirs": ["./generator/src"],
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "allowJs": false
   },
   "include": ["./generator/src/**/*"],
-  "exclude": ["./generator/src/**/*.test.ts"]
+  "exclude": ["./generator/src/**/*.test.ts", "./node_modules"]
 }
