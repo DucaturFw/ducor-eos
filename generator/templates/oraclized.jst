@@ -46,7 +46,7 @@ public:
            registry, N(ask),
            std::make_tuple(_self, data))
         .send();
-  }{{~ it.endpoint :e }}
+  }{{~ it.endpoints :e }}
   
   void push{{= e.suffix }}(account_name oracle, std::string data_id, {{= e.type }} data) 
   {
@@ -59,4 +59,4 @@ public:
   }{{~}}
 };
 
-EOSIO_ABI(YOUR_CONTRACT_NAME, (setup){{~ it.endpoint : e }}(push{{= e.suffix }}){{~}})
+EOSIO_ABI(YOUR_CONTRACT_NAME, (setup){{~ it.endpoints : e }}(push{{= e.suffix }}){{~}})

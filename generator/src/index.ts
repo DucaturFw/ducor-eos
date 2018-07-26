@@ -1,4 +1,36 @@
-const oraclized = require("../templates/oraclized");
+export interface IFieldConfguration {
+  type: string;
+  name: string;
+}
+
+export interface IEndpointConfiguration {
+  suffix: string;
+  type: string;
+}
+
+export interface IDataProviderConfiguration {
+  id: string;
+  name: string;
+  alias: string;
+  type: string;
+  bestBefore: number;
+  updateAfter: number;
+}
+
+export interface ICustomTypeConfiguration {
+  name: string;
+  fields?: IFieldConfguration[];
+}
+export interface IEOSGeneratorConfiguration {
+  customs?: ICustomTypeConfiguration[];
+  providers?: IDataProviderConfiguration[];
+  endpoints?: IEndpointConfiguration[];
+}
+
+const oraclized = require("../templates/oraclized") as (
+  config: IEOSGeneratorConfiguration
+) => string;
+
 console.log(
   oraclized({
     customs: [
@@ -48,7 +80,7 @@ console.log(
         updateAfter: 60
       }
     ],
-    endpoint: [
+    endpoints: [
       { suffix: "uint", type: "uint64_t" },
       { suffix: "str", type: "std::string" },
       { suffix: "price", type: "price" }

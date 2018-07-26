@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const oraclized = require("../templates/oraclized");
 console.log(oraclized({
     customs: [
@@ -9,17 +10,6 @@ console.log(oraclized({
                 { type: "uint8_t", name: "decimals" }
             ]
         }
-        // {
-        //   name: "orderbook",
-        //   fields: [
-        //     { type: "uint64_t", name: "buy_amount" },
-        //     { type: "uint64_t", name: "buy_price" },
-        //     { type: "uint64_t", name: "sell_amount" },
-        //     { type: "uint64_t", name: "sell_price" },
-        //     { type: "uint64_t", name: "spread" },
-        //     { type: "uint8_t", name: "decimals" }
-        //   ]
-        // }
     ],
     providers: [
         {
@@ -55,7 +45,7 @@ console.log(oraclized({
             updateAfter: 60
         }
     ],
-    endpoint: [
+    endpoints: [
         { suffix: "uint", type: "uint64_t" },
         { suffix: "str", type: "std::string" },
         { suffix: "price", type: "price" }
