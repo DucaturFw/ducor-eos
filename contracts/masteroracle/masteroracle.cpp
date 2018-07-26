@@ -81,11 +81,13 @@ public:
   masteroracle(account_name s) : contract(s), requests(_self, _self), token(N(ducaturtoken)) {}
 
   // @abi action
-  void ask(account_name contract, std::string task)
+  void ask(account_name administrator, account_name contract, std::string task)
   {
+    require_auth(administrator);
+
     auto itt = requests.find(request::get_hash(task, contract));
     eosio_assert(itt == requests.end(), "Already known request");
-    requests.emplace(contract, [&](request &r) {
+    requests.emplace(administrator, [&](request &r) {
       r.task = task;
       r.contract = contract;
       r.timestamp = now();

@@ -1,5 +1,5 @@
 (module
- (type $FUNCSIG$viji (func (param i32 i64 i32)))
+ (type $FUNCSIG$vijji (func (param i32 i64 i64 i32)))
  (type $FUNCSIG$v (func))
  (type $FUNCSIG$j (func (result i64)))
  (type $FUNCSIG$vjj (func (param i64 i64)))
@@ -7,6 +7,7 @@
  (type $FUNCSIG$vii (func (param i32 i32)))
  (type $FUNCSIG$i (func (result i32)))
  (type $FUNCSIG$iii (func (param i32 i32) (result i32)))
+ (type $FUNCSIG$vj (func (param i64)))
  (type $FUNCSIG$ijjjjii (func (param i64 i64 i64 i64 i32 i32) (result i32)))
  (type $FUNCSIG$ijjjj (func (param i64 i64 i64 i64) (result i32)))
  (type $FUNCSIG$viii (func (param i32 i32 i32)))
@@ -22,10 +23,11 @@
  (import "env" "memmove" (func $memmove (param i32 i32 i32) (result i32)))
  (import "env" "memset" (func $memset (param i32 i32 i32) (result i32)))
  (import "env" "read_action_data" (func $read_action_data (param i32 i32) (result i32)))
+ (import "env" "require_auth" (func $require_auth (param i64)))
  (import "env" "require_auth2" (func $require_auth2 (param i64 i64)))
  (import "env" "sha256" (func $sha256 (param i32 i32 i32)))
  (table 2 2 anyfunc)
- (elem (i32.const 0) $__wasm_nullptr $_ZN7ducatur12masteroracle3askEyNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE)
+ (elem (i32.const 0) $__wasm_nullptr $_ZN7ducatur12masteroracle3askEyyNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE)
  (memory $0 1)
  (data (i32.const 4) "\b0b\00\00")
  (data (i32.const 16) "0123456789abcdef")
@@ -975,7 +977,7 @@
     )
    )
    (drop
-    (call $_ZN5eosio14execute_actionIN7ducatur12masteroracleES2_JyNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_E
+    (call $_ZN5eosio14execute_actionIN7ducatur12masteroracleES2_JyyNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_E
      (i32.add
       (get_local $11)
       (i32.const 24)
@@ -1094,11 +1096,11 @@
    )
   )
  )
- (func $_ZN7ducatur12masteroracle3askEyNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE (type $FUNCSIG$viji) (param $0 i32) (param $1 i64) (param $2 i32)
-  (local $3 i32)
+ (func $_ZN7ducatur12masteroracle3askEyyNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE (type $FUNCSIG$vijji) (param $0 i32) (param $1 i64) (param $2 i64) (param $3 i32)
+  (local $4 i32)
   (i32.store offset=4
    (i32.const 0)
-   (tee_local $3
+   (tee_local $4
     (i32.sub
      (i32.load offset=4
       (i32.const 0)
@@ -1108,21 +1110,24 @@
    )
   )
   (i64.store offset=40
-   (get_local $3)
+   (get_local $4)
+   (get_local $2)
+  )
+  (call $require_auth
    (get_local $1)
   )
   (drop
    (call $_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEC2ERKS5_
     (i32.add
-     (get_local $3)
+     (get_local $4)
      (i32.const 16)
     )
-    (get_local $2)
+    (get_local $3)
    )
   )
   (call $_ZNK5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE4findEy
    (i32.add
-    (get_local $3)
+    (get_local $4)
     (i32.const 32)
    )
    (tee_local $0
@@ -1133,10 +1138,10 @@
    )
    (call $_ZN7ducatur7request8get_hashENSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEy
     (i32.add
-     (get_local $3)
+     (get_local $4)
      (i32.const 16)
     )
-    (get_local $1)
+    (get_local $2)
    )
   )
   (block $label$0
@@ -1144,7 +1149,7 @@
     (i32.eqz
      (i32.and
       (i32.load8_u offset=16
-       (get_local $3)
+       (get_local $4)
       )
       (i32.const 1)
      )
@@ -1152,57 +1157,53 @@
    )
    (call $_ZdlPv
     (i32.load offset=24
-     (get_local $3)
-    )
-   )
-   (set_local $1
-    (i64.load offset=40
-     (get_local $3)
+     (get_local $4)
     )
    )
   )
   (call $eosio_assert
    (i32.eqz
     (i32.load offset=36
-     (get_local $3)
+     (get_local $4)
     )
    )
    (i32.const 176)
   )
   (i32.store offset=8
+   (get_local $4)
    (get_local $3)
-   (get_local $2)
   )
   (i32.store offset=12
-   (get_local $3)
+   (get_local $4)
    (i32.add
-    (get_local $3)
+    (get_local $4)
     (i32.const 40)
    )
   )
-  (call $_ZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_
-   (get_local $3)
+  (call $_ZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_
+   (get_local $4)
    (get_local $0)
    (get_local $1)
    (i32.add
-    (get_local $3)
+    (get_local $4)
     (i32.const 8)
    )
   )
   (i32.store offset=4
    (i32.const 0)
    (i32.add
-    (get_local $3)
+    (get_local $4)
     (i32.const 48)
    )
   )
  )
- (func $_ZN5eosio14execute_actionIN7ducatur12masteroracleES2_JyNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_E (param $0 i32) (param $1 i32) (result i32)
+ (func $_ZN5eosio14execute_actionIN7ducatur12masteroracleES2_JyyNSt3__112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_E (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
+  (local $4 i32)
   (i32.store offset=4
    (i32.const 0)
-   (tee_local $3
+   (tee_local $4
     (i32.sub
      (i32.load offset=4
       (i32.const 0)
@@ -1212,19 +1213,19 @@
    )
   )
   (i32.store offset=44
-   (tee_local $2
-    (get_local $3)
+   (tee_local $3
+    (get_local $4)
    )
    (get_local $0)
   )
   (i32.store offset=32
-   (get_local $2)
+   (get_local $3)
    (i32.load
     (get_local $1)
    )
   )
   (i32.store offset=36
-   (get_local $2)
+   (get_local $3)
    (i32.load offset=4
     (get_local $1)
    )
@@ -1259,7 +1260,7 @@
      (i32.const 0)
      (tee_local $1
       (i32.sub
-       (get_local $3)
+       (get_local $4)
        (i32.and
         (i32.add
          (get_local $0)
@@ -1280,29 +1281,35 @@
   )
   (i32.store
    (i32.add
-    (get_local $2)
+    (get_local $3)
     (i32.const 24)
    )
    (i32.const 0)
   )
   (i64.store offset=8
-   (get_local $2)
+   (get_local $3)
+   (i64.const 0)
+  )
+  (i64.store
+   (get_local $3)
    (i64.const 0)
   )
   (i64.store offset=16
-   (get_local $2)
+   (get_local $3)
    (i64.const 0)
   )
-  (i32.store offset=56
-   (get_local $2)
-   (i32.add
-    (get_local $1)
-    (get_local $0)
-   )
-  )
   (i32.store offset=48
-   (get_local $2)
+   (get_local $3)
    (get_local $1)
+  )
+  (i32.store offset=56
+   (get_local $3)
+   (tee_local $4
+    (i32.add
+     (get_local $1)
+     (get_local $0)
+    )
+   )
   )
   (call $eosio_assert
    (i32.gt_u
@@ -1313,33 +1320,52 @@
   )
   (drop
    (call $memcpy
-    (i32.add
-     (get_local $2)
-     (i32.const 8)
-    )
+    (get_local $3)
     (get_local $1)
     (i32.const 8)
    )
   )
+  (call $eosio_assert
+   (i32.gt_u
+    (i32.sub
+     (get_local $4)
+     (tee_local $2
+      (i32.add
+       (get_local $1)
+       (i32.const 8)
+      )
+     )
+    )
+    (i32.const 7)
+   )
+   (i32.const 144)
+  )
+  (drop
+   (call $memcpy
+    (i32.add
+     (get_local $3)
+     (i32.const 8)
+    )
+    (get_local $2)
+    (i32.const 8)
+   )
+  )
   (i32.store offset=52
-   (get_local $2)
+   (get_local $3)
    (i32.add
     (get_local $1)
-    (i32.const 8)
+    (i32.const 16)
    )
   )
   (drop
    (call $_ZN5eosiorsINS_10datastreamIPKcEEEERT_S6_RNSt3__112basic_stringIcNS7_11char_traitsIcEENS7_9allocatorIcEEEE
     (i32.add
-     (get_local $2)
+     (get_local $3)
      (i32.const 48)
     )
     (i32.add
-     (i32.add
-      (get_local $2)
-      (i32.const 8)
-     )
-     (i32.const 8)
+     (get_local $3)
+     (i32.const 16)
     )
    )
   )
@@ -1355,35 +1381,32 @@
    )
   )
   (i32.store offset=52
-   (get_local $2)
+   (get_local $3)
    (i32.add
-    (get_local $2)
+    (get_local $3)
     (i32.const 32)
    )
   )
   (i32.store offset=48
-   (get_local $2)
+   (get_local $3)
    (i32.add
-    (get_local $2)
+    (get_local $3)
     (i32.const 44)
    )
   )
-  (call $_ZN5boost4mp116detail16tuple_apply_implIRZN5eosio14execute_actionIN7ducatur12masteroracleES6_JyNSt3__112basic_stringIcNS7_11char_traitsIcEENS7_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_EEUlDpT_E_RNS7_5tupleIJySD_EEEJLj0ELj1EEEEDTclclsr3stdE7forwardISE_Efp_Espclsr3stdE3getIXT1_EEclsr3stdE7forwardISG_Efp0_EEEEOSE_OSG_NS0_16integer_sequenceIjJXspT1_EEEE
+  (call $_ZN5boost4mp116detail16tuple_apply_implIRZN5eosio14execute_actionIN7ducatur12masteroracleES6_JyyNSt3__112basic_stringIcNS7_11char_traitsIcEENS7_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_EEUlDpT_E_RNS7_5tupleIJyySD_EEEJLj0ELj1ELj2EEEEDTclclsr3stdE7forwardISE_Efp_Espclsr3stdE3getIXT1_EEclsr3stdE7forwardISG_Efp0_EEEEOSE_OSG_NS0_16integer_sequenceIjJXspT1_EEEE
    (i32.add
-    (get_local $2)
+    (get_local $3)
     (i32.const 48)
    )
-   (i32.add
-    (get_local $2)
-    (i32.const 8)
-   )
+   (get_local $3)
   )
   (block $label$4
    (br_if $label$4
     (i32.eqz
      (i32.and
       (i32.load8_u offset=16
-       (get_local $2)
+       (get_local $3)
       )
       (i32.const 1)
      )
@@ -1392,7 +1415,7 @@
    (call $_ZdlPv
     (i32.load
      (i32.add
-      (get_local $2)
+      (get_local $3)
       (i32.const 24)
      )
     )
@@ -1401,7 +1424,7 @@
   (i32.store offset=4
    (i32.const 0)
    (i32.add
-    (get_local $2)
+    (get_local $3)
     (i32.const 64)
    )
   )
@@ -1726,19 +1749,25 @@
   )
   (unreachable)
  )
- (func $_ZN5boost4mp116detail16tuple_apply_implIRZN5eosio14execute_actionIN7ducatur12masteroracleES6_JyNSt3__112basic_stringIcNS7_11char_traitsIcEENS7_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_EEUlDpT_E_RNS7_5tupleIJySD_EEEJLj0ELj1EEEEDTclclsr3stdE7forwardISE_Efp_Espclsr3stdE3getIXT1_EEclsr3stdE7forwardISG_Efp0_EEEEOSE_OSG_NS0_16integer_sequenceIjJXspT1_EEEE (param $0 i32) (param $1 i32)
+ (func $_ZN5boost4mp116detail16tuple_apply_implIRZN5eosio14execute_actionIN7ducatur12masteroracleES6_JyyNSt3__112basic_stringIcNS7_11char_traitsIcEENS7_9allocatorIcEEEEEEEbPT_MT0_FvDpT1_EEUlDpT_E_RNS7_5tupleIJyySD_EEEJLj0ELj1ELj2EEEEDTclclsr3stdE7forwardISE_Efp_Espclsr3stdE3getIXT1_EEclsr3stdE7forwardISG_Efp0_EEEEOSE_OSG_NS0_16integer_sequenceIjJXspT1_EEEE (param $0 i32) (param $1 i32)
   (local $2 i64)
-  (local $3 i32)
+  (local $3 i64)
   (local $4 i32)
+  (local $5 i32)
   (i32.store offset=4
    (i32.const 0)
-   (tee_local $4
+   (tee_local $5
     (i32.sub
      (i32.load offset=4
       (i32.const 0)
      )
      (i32.const 32)
     )
+   )
+  )
+  (set_local $3
+   (i64.load offset=8
+    (get_local $1)
    )
   )
   (set_local $2
@@ -1748,14 +1777,14 @@
   )
   (drop
    (call $_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEC2ERKS5_
-    (get_local $4)
+    (get_local $5)
     (i32.add
      (get_local $1)
-     (i32.const 8)
+     (i32.const 16)
     )
    )
   )
-  (set_local $1
+  (set_local $0
    (i32.add
     (i32.load
      (i32.load
@@ -1763,9 +1792,9 @@
      )
     )
     (i32.shr_s
-     (tee_local $3
+     (tee_local $4
       (i32.load offset=4
-       (tee_local $0
+       (tee_local $1
         (i32.load offset=4
          (get_local $0)
         )
@@ -1776,27 +1805,27 @@
     )
    )
   )
-  (set_local $0
+  (set_local $1
    (i32.load
-    (get_local $0)
+    (get_local $1)
    )
   )
   (block $label$0
    (br_if $label$0
     (i32.eqz
      (i32.and
-      (get_local $3)
+      (get_local $4)
       (i32.const 1)
      )
     )
    )
-   (set_local $0
+   (set_local $1
     (i32.load
      (i32.add
       (i32.load
-       (get_local $1)
+       (get_local $0)
       )
-      (get_local $0)
+      (get_local $1)
      )
     )
    )
@@ -1804,27 +1833,28 @@
   (drop
    (call $_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEC2ERKS5_
     (i32.add
-     (get_local $4)
+     (get_local $5)
      (i32.const 16)
     )
-    (get_local $4)
+    (get_local $5)
    )
   )
-  (call_indirect (type $FUNCSIG$viji)
-   (get_local $1)
+  (call_indirect (type $FUNCSIG$vijji)
+   (get_local $0)
    (get_local $2)
+   (get_local $3)
    (i32.add
-    (get_local $4)
+    (get_local $5)
     (i32.const 16)
    )
-   (get_local $0)
+   (get_local $1)
   )
   (block $label$1
    (br_if $label$1
     (i32.eqz
      (i32.and
       (i32.load8_u offset=16
-       (get_local $4)
+       (get_local $5)
       )
       (i32.const 1)
      )
@@ -1832,7 +1862,7 @@
    )
    (call $_ZdlPv
     (i32.load offset=24
-     (get_local $4)
+     (get_local $5)
     )
    )
   )
@@ -1841,7 +1871,7 @@
     (i32.eqz
      (i32.and
       (i32.load8_u
-       (get_local $4)
+       (get_local $5)
       )
       (i32.const 1)
      )
@@ -1849,14 +1879,14 @@
    )
    (call $_ZdlPv
     (i32.load offset=8
-     (get_local $4)
+     (get_local $5)
     )
    )
   )
   (i32.store offset=4
    (i32.const 0)
    (i32.add
-    (get_local $4)
+    (get_local $5)
     (i32.const 32)
    )
   )
@@ -2671,7 +2701,7 @@
    )
   )
  )
- (func $_ZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_ (param $0 i32) (param $1 i32) (param $2 i64) (param $3 i32)
+ (func $_ZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_ (param $0 i32) (param $1 i32) (param $2 i64) (param $3 i32)
   (local $4 i32)
   (local $5 i32)
   (local $6 i32)
@@ -2732,7 +2762,7 @@
    (get_local $3)
    (get_local $1)
   )
-  (call $_ZZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_ENKUlRSG_E_clINS3_4itemEEEDaSI_
+  (call $_ZZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_ENKUlRSG_E_clINS3_4itemEEEDaSI_
    (i32.add
     (get_local $8)
     (i32.const 32)
@@ -2918,7 +2948,7 @@
    )
   )
  )
- (func $_ZZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_ENKUlRSG_E_clINS3_4itemEEEDaSI_ (param $0 i32) (param $1 i32)
+ (func $_ZZN5eosio11multi_indexILy13451589507182755840EN7ducatur7requestEJEE7emplaceIZNS1_12masteroracle3askEyyNSt3__112basic_stringIcNS6_11char_traitsIcEENS6_9allocatorIcEEEEEUlRS2_E_EENS3_14const_iteratorEyOT_ENKUlRSG_E_clINS3_4itemEEEDaSI_ (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
