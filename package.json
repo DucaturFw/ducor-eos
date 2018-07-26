@@ -8,7 +8,7 @@
     "migrate": "eosic migrate",
     "start": "eosic start",
     "prepare": "tsc && node generator/lib/prepare.js",
-    "generate": "node generator/lib/index.js"
+    "generate": "yarn prepare && node generator/lib/index.js"
   },
   "dependencies": {
     "dot": "^1.1.2",

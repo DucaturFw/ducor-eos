@@ -1,12 +1,40 @@
 "use strict";
 const oraclized = require("../templates/oraclized");
 console.log(oraclized({
+    customs: [
+        {
+            name: "price",
+            fields: [
+                { type: "uint64_t", name: "value" },
+                { type: "uint8_t", name: "decimals" }
+            ]
+        }
+        // {
+        //   name: "orderbook",
+        //   fields: [
+        //     { type: "uint64_t", name: "buy_amount" },
+        //     { type: "uint64_t", name: "buy_price" },
+        //     { type: "uint64_t", name: "sell_amount" },
+        //     { type: "uint64_t", name: "sell_price" },
+        //     { type: "uint64_t", name: "spread" },
+        //     { type: "uint8_t", name: "decimals" }
+        //   ]
+        // }
+    ],
     providers: [
         {
             id: "0xa171dc074ec6e8322d342075684229733fc8d05c97cae16c031249a04998b874",
             name: "btcusd",
             alias: "btcusd",
             type: "uint64_t",
+            bestBefore: 84600,
+            updateAfter: 3600
+        },
+        {
+            id: "0xa171dc074ec6e8322d342075684229733fc8d05c97cae16c031249a04998b874",
+            name: "btcprice",
+            alias: "btcprice",
+            type: "price",
             bestBefore: 84600,
             updateAfter: 3600
         },
@@ -29,7 +57,8 @@ console.log(oraclized({
     ],
     endpoint: [
         { suffix: "uint", type: "uint64_t" },
-        { suffix: "str", type: "std::string" }
+        { suffix: "str", type: "std::string" },
+        { suffix: "price", type: "price" }
     ]
 }));
 //# sourceMappingURL=index.js.map

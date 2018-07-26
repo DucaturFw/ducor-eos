@@ -4,6 +4,14 @@
 
 using namespace eosio;
 
+{{~ it.customs :c}}struct {{= c.name}}
+{
+  {{~ c.fields :f}}{{= f.type }} {{= f.name }};
+  {{~}}
+
+  EOSLIB_SERIALIZE({{= c.name }}, {{~ c.fields :f}}({{= f.name }}){{~}})
+};
+{{~}}
 {{~ it.providers :p }}
 typedef oraclized<N({{= p.alias }}), {{= p.bestBefore }}, {{= p.updateAfter }}, {{= p.type }}> {{= p.name }}_data;{{~}}
 typedef singleton<N(master), account_name> oraclize_master;
@@ -24,15 +32,15 @@ public:
     master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
   }
 
-  void setup(account_name master, account_name registry)
+  void setup(account_name administrator, account_name master, account_name registry)
   {
     require_auth(_self);
     oraclize_master(_self, _self).set(master, _self);
-    {{~ it.providers :p}}ask_data(registry, "{{= p.id }}");
+    {{~ it.providers :p}}ask_data(administrator, registry, "{{= p.id }}");
     {{~}}
   }
 
-  void ask_data(account_name registry, std::string data)
+  void ask_data(account_name administrator, account_name registry, std::string data)
   {
     action(permission_level{_self, N(active)},
            registry, N(ask),
