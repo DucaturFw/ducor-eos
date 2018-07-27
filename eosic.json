@@ -10,7 +10,7 @@
       "version": "0.0.1.1",
       "description": "Master Oracle Contract",
       "entry": "masteroracle.cpp",
-      "checksum": "019a61d991ebefb3ba631bc173729f26"
+      "checksum": "ab5b5801b8ba43cb2026ceeeaa0b182c"
     },
     "priceoraclize": {
       "name": "priceoraclize",

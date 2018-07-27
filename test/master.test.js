@@ -118,6 +118,18 @@ describe("exchange", () => {
     });
   });
 
+  it("read request", async () => {
+    console.log(
+      await eos.getTableRows({
+        code: masterAccount,
+        scope: masterAccount,
+        table: "request",
+        json: true,
+        limit: 999
+      })
+    );
+  });
+
   it("reject sell", async () => {
     await expectAssert(
       oraclizeContract.sell("eosio", 1, {

@@ -9,20 +9,6 @@ using namespace eosio;
 
 namespace ducatur
 {
-constexpr char hexmap[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-std::string hexStr(const char *data, int len)
-{
-  std::string s(len * 2, ' ');
-  for (int i = 0; i < len; ++i)
-  {
-    s[2 * i] = hexmap[(data[i] & 0xF0) >> 4];
-    s[2 * i + 1] = hexmap[data[i] & 0x0F];
-  }
-  return s;
-}
-
 // @abi table hash i64
 struct requestHash
 {
@@ -47,8 +33,9 @@ struct request
   std::string task;
   account_name contract;
   uint32_t timestamp;
+  bool active;
 
-  uint64_t primary_key()
+  uint64_t primary_key() const
   {
     return get_hash(task, contract);
   }
@@ -65,7 +52,7 @@ struct request
     return p64[0] ^ p64[1] ^ p64[2] ^ p64[3];
   }
 
-  EOSLIB_SERIALIZE(request, (task)(contract)(timestamp))
+  EOSLIB_SERIALIZE(request, (task)(contract)(timestamp)(active))
 };
 
 typedef multi_index<N(request), request> request_table;
@@ -84,16 +71,44 @@ public:
   void ask(account_name administrator, account_name contract, std::string task)
   {
     require_auth(administrator);
-
     auto itt = requests.find(request::get_hash(task, contract));
     eosio_assert(itt == requests.end(), "Already known request");
     requests.emplace(administrator, [&](request &r) {
       r.task = task;
       r.contract = contract;
       r.timestamp = now();
+      r.active = true;
+    });
+  }
+
+  // @abi action
+  void stop(account_name administrator, account_name contract, std::string task)
+  {
+    require_auth(administrator);
+    uint64_t id = request::get_hash(task, contract);
+    auto itt = requests.find(id);
+    eosio_assert(itt != requests.end(), "Unknown request");
+    eosio_assert(itt->active, "Non-active request");
+
+    requests.modify(itt, administrator, [&](request &r) {
+      r.active = false;
+    });
+  }
+
+  // @abi action
+  void start(account_name administrator, account_name contract, std::string task)
+  {
+    require_auth(administrator);
+    uint64_t id = request::get_hash(task, contract);
+    auto itt = requests.find(id);
+    eosio_assert(itt != requests.end(), "Unknown request");
+    eosio_assert(!(itt->active), "Active request");
+
+    requests.modify(itt, administrator, [&](request &r) {
+      r.active = true;
     });
   }
 };
 
-EOSIO_ABI(masteroracle, (ask))
+EOSIO_ABI(masteroracle, (ask)(stop)(start))
 } // namespace ducatur
