@@ -42,9 +42,9 @@ public:
 
   void ask_data(account_name administrator, account_name registry, std::string data)
   {
-    action(permission_level{_self, N(active)},
+    action(permission_level{administrator, N(active)},
            registry, N(ask),
-           std::make_tuple(_self, data))
+           std::make_tuple(administrator, _self, data))
         .send();
   }{{~ it.endpoints :e }}
   
