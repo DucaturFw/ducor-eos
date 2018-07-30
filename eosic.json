@@ -17,7 +17,7 @@
       "version": "0.0.1.1",
       "description": "Generic EOS contract",
       "entry": "priceoraclize.cpp",
-      "checksum": "cbd562dad19b6107944e17892506a6fc"
+      "checksum": "60cd9ee210eb9810a421c16f9bfeddab"
     },
     "hello": {
       "name": "hello",
