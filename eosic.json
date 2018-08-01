@@ -17,7 +17,7 @@
       "version": "0.0.1.1",
       "description": "Generic EOS contract",
       "entry": "priceoraclize.cpp",
-      "checksum": "60cd9ee210eb9810a421c16f9bfeddab"
+      "checksum": "5a86c7577933451f1ef43b4c98888d3a"
     },
     "hello": {
       "name": "hello",
@@ -25,6 +25,13 @@
       "description": "Generic EOS contract",
       "entry": "hello.cpp",
       "checksum": "bddb33bd3e506118cf9e5947ca651ee6"
+    },
+    "betoraclize": {
+      "name": "betoraclize",
+      "version": "0.0.1.1",
+      "description": "Generic EOS contract",
+      "entry": "betoraclize.cpp",
+      "checksum": "840a258c9b894ad32b0846ca6f253119"
     }
   }
 }

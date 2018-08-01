@@ -1,8 +1,97 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/singleton.hpp>
-#include "oraclized.hpp"
+#include <eosiolib/time.hpp>
+#include <eosiolib/system.h>
 
 using namespace eosio;
+
+template <uint64_t OraclizeName, uint32_t BestBeforeOffset, uint32_t UpdateOffset, typename T>
+class oraclized
+{
+  struct data
+  {
+    uint32_t best_before;
+    uint32_t update_after;
+    T value;
+
+    EOSLIB_SERIALIZE(data, (best_before)(update_after)(value))
+  };
+
+  constexpr static uint64_t pk_value = OraclizeName;
+  struct row
+  {
+    data value;
+
+    uint64_t primary_key() const { return pk_value; }
+
+    EOSLIB_SERIALIZE(row, (value))
+  };
+
+  typedef eosio::multi_index<OraclizeName, row> table;
+
+private:
+  table _t;
+
+public:
+  oraclized(account_name code, scope_name scope) : _t(code, scope) {}
+
+  bool exists()
+  {
+    return _t.find(pk_value) != _t.end();
+  }
+
+  bool fresh()
+  {
+    return exists() && get().best_before > now();
+  }
+
+  T value()
+  {
+    return get().value;
+  }
+
+  data get()
+  {
+    auto itr = _t.find(pk_value);
+    eosio_assert(itr != _t.end(), "singleton does not exist");
+    return itr->value;
+  }
+
+  data get_or_default(const T &def = T())
+  {
+    auto itr = _t.find(pk_value);
+    return itr != _t.end() ? itr->value : def;
+  }
+
+  data get_or_create(account_name bill_to_account, const T &def = T())
+  {
+    auto itr = _t.find(pk_value);
+    return itr != _t.end() ? itr->value
+                           : _t.emplace(bill_to_account, [&](row &r) { r.value = data{}; });
+  }
+
+  void set(const T &value, account_name bill_to_account)
+  {
+    auto itr = _t.find(pk_value);
+    if (itr != _t.end())
+    {
+      _t.modify(itr, bill_to_account, [&](row &r) { r.value = data{now() + BestBeforeOffset, now() + UpdateOffset, value}; });
+    }
+    else
+    {
+      _t.emplace(bill_to_account, [&](row &r) { r.value = data{now() + BestBeforeOffset, now() + UpdateOffset, value}; });
+    }
+  }
+
+  void remove()
+  {
+    auto itr = _t.find(pk_value);
+    if (itr != _t.end())
+    {
+      _t.erase(itr);
+    }
+  }
+};
 
 struct price
 {
