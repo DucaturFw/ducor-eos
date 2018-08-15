@@ -634,6 +634,10 @@ deep-eql@^3.0.0:
   dependencies:
     type-detect "^4.0.0"
 
+deepmerge@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-2.1.1.tgz#e862b4e45ea0555072bf51e7fd0d9845170ae768"
+
 define-property@^0.2.5:
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/define-property/-/define-property-0.2.5.tgz#c35b1ef918ec3c990f9a5bc57be04aacec5c8116"
@@ -708,9 +712,9 @@ end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-eosic@DucaturFw/eosic#develop:
-  version "0.0.2"
-  resolved "https://codeload.github.com/DucaturFw/eosic/tar.gz/b5acee7d80cb7c306184999ae1659a8eea1b1fa6"
+eosic@DucaturFw/eosic:
+  version "0.0.3"
+  resolved "https://codeload.github.com/DucaturFw/eosic/tar.gz/2b6de0918067ef4925bb3e6bd7c47ce5a610a502"
   dependencies:
     "@oclif/command" "^1"
     "@oclif/config" "^1"
@@ -724,6 +728,7 @@ eosic@DucaturFw/eosic#develop:
     "@types/slug" "^0.9.0"
     axios "^0.18.0"
     death "^1.1.0"
+    deepmerge "^2.1.1"
     dirsum "^0.1.1"
     dockerode "^2.5.5"
     eosjs "^15.0.0"

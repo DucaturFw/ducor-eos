@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "dot": "^1.1.2",
-    "eosic": "DucaturFw/eosic#develop",
+    "eosic": "DucaturFw/eosic",
     "eosjs": "^15.0.6"
   },
   "devDependencies": {
