@@ -104,6 +104,7 @@ public:
 {{~ it.providers :p }}
 typedef oraclized<N({{= p.alias }}), {{= p.bestBefore }}, {{= p.updateAfter }}, {{= p.type }}> {{= p.name }}_data;{{~}}
 typedef singleton<N(master), account_name> oraclize_master;
+typedef singleton<N(master), account_name> oracle_account;
 
 class YOUR_CONTRACT_NAME : public eosio::contract
 {
@@ -111,14 +112,16 @@ private:
 {{~ it.providers :p }}
   {{= p.name }}_data {{= p.name }};{{~}}
 
-  account_name master;
+  account_name known_master;
+  account_name known_oracle;
 
 public:
   using contract::contract;
 
   YOUR_CONTRACT_NAME(account_name s) : contract(s){{~ it.providers :p }}, {{= p.name }}(_self, _self){{~}}
   {
-    master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
+    known_master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
+    known_oracle = oracle_account(_self, _self).get_or_create(_self, N(undefined));
   }
 
   void setup(account_name administrator, account_name master, account_name registry)
