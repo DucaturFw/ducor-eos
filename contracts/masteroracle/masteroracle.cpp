@@ -6,53 +6,61 @@
 #include "masteroracle.hpp"
 
 using namespace eosio;
+using std::string;
 
 namespace ducatur
 {
-// @abi table hash i64
-struct requestHash
-{
-  account_name contract;
-  std::string task;
 
-  checksum256 get_hash()
-  {
-    checksum256 result;
-    size_t tasklen = strlen(task.c_str());
-    char *buffer = (char *)malloc(tasklen + 8);
-    memcpy(buffer, &contract, 8);
-    memcpy(buffer + 8, task.data(), tasklen);
-    sha256(buffer, tasklen + 8, &result);
-    return result;
-  }
-};
+checksum256 get_hash(const string &task, const account_name &contract)
+{
+  checksum256 result;
+  size_t tasklen = strlen(task.c_str());
+  char *buffer = (char *)malloc(tasklen + 8);
+  memcpy(buffer, &contract, 8);
+  memcpy(buffer + 8, task.data(), tasklen);
+  sha256(buffer, tasklen + 8, &result);
+  return result;
+}
+
+checksum256 get_full_hash(const string &task, const string &memo, const account_name &contract)
+{
+  checksum256 result;
+  size_t tasklen = strlen(task.c_str());
+  size_t memolen = strlen(memo.c_str());
+  char *buffer = (char *)malloc(tasklen + memolen + 8);
+  memcpy(buffer, &contract, 8);
+  memcpy(buffer + 8, task.data(), tasklen);
+  memcpy(buffer + tasklen + 8, memo.data(), memolen);
+  sha256(buffer, tasklen + 8, &result);
+  return result;
+}
+
+uint64_t pack_hash(checksum256 hash)
+{
+  const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&hash);
+  return p64[0] ^ p64[1] ^ p64[2] ^ p64[3];
+}
 
 // @abi table request i64
 struct request
 {
-  std::string task;
+  string task;
+  string memo;
   account_name contract;
   uint32_t timestamp;
   bool active;
 
   uint64_t primary_key() const
   {
-    return get_hash(task, contract);
+    return pack_hash(get_hash(task, contract));
   }
 
-  static uint64_t get_hash(std::string task, uint64_t contract)
+  uint64_t full_key() const
   {
-    requestHash rh{contract, task};
-    return pack_hash(rh.get_hash());
+    return pack_hash(get_full_hash(task, memo, contract));
   }
 
-  static uint64_t pack_hash(checksum256 hash)
-  {
-    const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&hash);
-    return p64[0] ^ p64[1] ^ p64[2] ^ p64[3];
-  }
-
-  EOSLIB_SERIALIZE(request, (task)(contract)(timestamp)(active))
+  EOSLIB_SERIALIZE(request, (task)(memo)(contract)(timestamp)(active))
 };
 
 typedef multi_index<N(request), request> request_table;
@@ -68,10 +76,10 @@ public:
   masteroracle(account_name s) : contract(s), requests(_self, _self), token(N(ducaturtoken)) {}
 
   // @abi action
-  void ask(account_name administrator, account_name contract, std::string task)
+  void ask(account_name administrator, account_name contract, string task, string memo)
   {
     require_auth(administrator);
-    auto itt = requests.find(request::get_hash(task, contract));
+    auto itt = requests.find(pack_hash(get_hash(task, contract)));
     eosio_assert(itt == requests.end(), "Already known request");
     requests.emplace(administrator, [&](request &r) {
       r.task = task;
@@ -82,10 +90,10 @@ public:
   }
 
   // @abi action
-  void stop(account_name administrator, account_name contract, std::string task)
+  void stop(account_name administrator, account_name contract, string task, string memo)
   {
     require_auth(administrator);
-    uint64_t id = request::get_hash(task, contract);
+    uint64_t id = pack_hash(get_hash(task, contract));
     auto itt = requests.find(id);
     eosio_assert(itt != requests.end(), "Unknown request");
     eosio_assert(itt->active, "Non-active request");
@@ -96,10 +104,10 @@ public:
   }
 
   // @abi action
-  void start(account_name administrator, account_name contract, std::string task)
+  void start(account_name administrator, account_name contract, string task, string memo)
   {
     require_auth(administrator);
-    uint64_t id = request::get_hash(task, contract);
+    uint64_t id = pack_hash(get_hash(task, contract));
     auto itt = requests.find(id);
     eosio_assert(itt != requests.end(), "Unknown request");
     eosio_assert(!(itt->active), "Active request");
