@@ -1,9 +1,11 @@
+#include <string>
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/singleton.hpp>
 #include <eosiolib/time.hpp>
 #include <eosiolib/system.h>
 
 using namespace eosio;
+using std::string;
 
 template <uint64_t OraclizeName, uint32_t BestBeforeOffset, uint32_t UpdateOffset, typename T>
 class oraclized
@@ -126,19 +128,19 @@ public:
   {
     require_auth(_self);
     oraclize_master(_self, _self).set(master, _self);
-    ask_data(administrator, registry, "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5");
-    ask_data(administrator, registry, "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347");
+    ask_data(administrator, registry, "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5", string());
+    ask_data(administrator, registry, "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347", string());
   }
 
-  void ask_data(account_name administrator, account_name registry, std::string data)
+  void ask_data(account_name administrator, account_name registry, string data, string memo)
   {
     action(permission_level{administrator, N(active)},
            registry, N(ask),
-           std::make_tuple(administrator, _self, data))
+           std::make_tuple(administrator, _self, data, memo))
         .send();
   }
 
-  void pushprice(account_name oracle, std::string data_id, price data)
+  void pushprice(account_name oracle, string data_id, string memo, price data)
   {
     require_auth(oracle);
 
