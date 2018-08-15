@@ -81,13 +81,9 @@ async function expectAssert(promise) {
 }
 
 const btcusd_id =
-  "0xa171dc074ec6e8322d342075684229733fc8d05c97cae16c031249a04998b874";
+  "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5";
 const btcprice_id =
-  "0xfa6bfea31ea21819ca2de9f530fcc2ebc80d0a1b6130c600f5c3c085a335fdec";
-const eosusd_id =
-  "0x43f298fa9ef0590967e26fd3d183de6c13475ab810b287ea643a94ce75806eb9";
-const hash_id =
-  "0xd65485674abcd1e477aa423556787039cec0c41fe373423c44feff042997f8ae";
+  "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347";
 
 describe("exchange", () => {
   let masterAccount, masterContract;
@@ -118,62 +114,76 @@ describe("exchange", () => {
     });
   });
 
-  it("read request", async () => {
-    console.log(
-      await eos.getTableRows({
-        code: masterAccount,
-        scope: masterAccount,
-        table: "request",
-        json: true,
-        limit: 999
-      })
-    );
-  });
-
-  it("reject sell", async () => {
-    await expectAssert(
-      oraclizeContract.sell("eosio", 1, {
-        authorization: ["eosio"]
-      })
-    );
-  });
-
-  it("push data", async () => {
-    await eos.transaction(allowContract("eosio", pub, masterAccount));
-
-    await oraclizeContract.pushuint(oracle, btcusd_id, 840000, {
-      authorization: [oracle]
-    });
-
-    await oraclizeContract.pushuint(oracle, eosusd_id, 500, {
-      authorization: [oracle]
-    });
-  });
-
-  it("sell", async () => {
-    await eos.transaction(allowContract("eosio", pub, masterAccount));
-
-    await oraclizeContract.pushuint(oracle, btcusd_id, 840000, {
-      authorization: [oracle]
-    });
-
-    await oraclizeContract.pushuint(oracle, eosusd_id, 500, {
-      authorization: [oracle]
-    });
-
-    await oraclizeContract.pushprice(
+  it("test self", async () => {
+    oraclizeContract.pushprice(
       oracle,
-      btcprice_id,
+      btcusd_id,
       {
-        value: 100500,
-        decimals: 8
+        value: 85000,
+        decimals: 4
       },
       {
         authorization: [oracle]
       }
     );
-    await oraclizeContract.sell("eosio", 5, {
-      authorization: ["eosio"]
-    });
   });
+
+  // it("read request", async () => {
+  //   console.log(
+  //     await eos.getTableRows({
+  //       code: masterAccount,
+  //       scope: masterAccount,
+  //       table: "request",
+  //       json: true,
+  //       limit: 999
+  //     })
+  //   );
+  // });
+
+  // it("reject sell", async () => {
+  //   await expectAssert(
+  //     oraclizeContract.sell("eosio", 1, {
+  //       authorization: ["eosio"]
+  //     })
+  //   );
+  // });
+
+  // it("push data", async () => {
+  //   await eos.transaction(allowContract("eosio", pub, masterAccount));
+
+  //   await oraclizeContract.pushuint(oracle, btcusd_id, 840000, {
+  //     authorization: [oracle]
+  //   });
+
+  //   await oraclizeContract.pushuint(oracle, eosusd_id, 500, {
+  //     authorization: [oracle]
+  //   });
+  // });
+
+  // it("sell", async () => {
+  //   await eos.transaction(allowContract("eosio", pub, masterAccount));
+
+  //   await oraclizeContract.pushuint(oracle, btcusd_id, 840000, {
+  //     authorization: [oracle]
+  //   });
+
+  //   await oraclizeContract.pushuint(oracle, eosusd_id, 500, {
+  //     authorization: [oracle]
+  //   });
+
+  //   await oraclizeContract.pushprice(
+  //     oracle,
+  //     btcprice_id,
+  //     {
+  //       value: 100500,
+  //       decimals: 8
+  //     },
+  //     {
+  //       authorization: [oracle]
+  //     }
+  //   );
+  //   await oraclizeContract.sell("eosio", 5, {
+  //     authorization: ["eosio"]
+  //   });
+  // });
 });
