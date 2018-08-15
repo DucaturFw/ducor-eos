@@ -109,8 +109,8 @@ describe("exchange", () => {
     oracle = `${pid}oracle`;
     await eosic.createAccount(eos, pub, oracle);
     await eos.transaction(allowContract("eosio", pub, oraclizeAccount));
-    await oraclizeContract.setup("eosio", oracle, masterAccount, {
-      authorization: ["eosio", oraclizeAccount]
+    await oraclizeContract.setup(oraclizeAccount, oracle, masterAccount, {
+      authorization: [oraclizeAccount]
     });
   });
 
@@ -128,17 +128,17 @@ describe("exchange", () => {
     );
   });
 
-  // it("read request", async () => {
-  //   console.log(
-  //     await eos.getTableRows({
-  //       code: masterAccount,
-  //       scope: masterAccount,
-  //       table: "request",
-  //       json: true,
-  //       limit: 999
-  //     })
-  //   );
-  // });
+  it("read request", async () => {
+    console.log(
+      await eos.getTableRows({
+        code: masterAccount,
+        scope: masterAccount,
+        table: "request",
+        json: true,
+        limit: 999
+      })
+    );
+  });
 
   // it("reject sell", async () => {
   //   await expectAssert(

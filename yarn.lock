@@ -712,9 +712,8 @@ end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-eosic@DucaturFw/eosic:
-  version "0.0.3"
-  resolved "https://codeload.github.com/DucaturFw/eosic/tar.gz/2b6de0918067ef4925bb3e6bd7c47ce5a610a502"
+"eosic@file:../eosic":
+  version "0.0.4"
   dependencies:
     "@oclif/command" "^1"
     "@oclif/config" "^1"
