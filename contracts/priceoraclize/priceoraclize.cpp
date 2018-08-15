@@ -121,6 +121,7 @@ public:
     master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
   }
 
+  // setup method 1
   void setup(account_name administrator, account_name master, account_name registry)
   {
     require_auth(_self);
@@ -143,11 +144,11 @@ public:
 
     if (strcmp(data_id.c_str(), "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5") == 0)
     {
-      ethbtc.set(data, oracle);
+      ethbtc.set(data, _self);
     }
     if (strcmp(data_id.c_str(), "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347") == 0)
     {
-      eoseth.set(data, oracle);
+      eoseth.set(data, _self);
     }
   }
 
