@@ -128,15 +128,15 @@ public:
   {
     require_auth(_self);
     oraclize_master(_self, _self).set(master, _self);
-    ask_data(administrator, registry, "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5", string());
-    ask_data(administrator, registry, "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347", string());
+    ask_data(administrator, registry, "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5", "custom-memo", "");
+    ask_data(administrator, registry, "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347", string(), "foo;bar");
   }
 
-  void ask_data(account_name administrator, account_name registry, string data, string memo)
+  void ask_data(account_name administrator, account_name registry, string data, string memo, string args)
   {
     action(permission_level{administrator, N(active)},
            registry, N(ask),
-           std::make_tuple(administrator, _self, data, memo))
+           std::make_tuple(administrator, _self, data, memo, args))
         .send();
   }
 

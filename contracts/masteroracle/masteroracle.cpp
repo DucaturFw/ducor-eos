@@ -46,6 +46,7 @@ struct request
 {
   string task;
   string memo;
+  string args;
   account_name contract;
   uint32_t timestamp;
   bool active;
@@ -60,7 +61,7 @@ struct request
     return pack_hash(get_full_hash(task, memo, contract));
   }
 
-  EOSLIB_SERIALIZE(request, (task)(memo)(contract)(timestamp)(active))
+  EOSLIB_SERIALIZE(request, (task)(memo)(args)(contract)(timestamp)(active))
 };
 
 typedef multi_index<N(request), request> request_table;
@@ -76,7 +77,7 @@ public:
   masteroracle(account_name s) : contract(s), requests(_self, _self), token(N(ducaturtoken)) {}
 
   // @abi action
-  void ask(account_name administrator, account_name contract, string task, string memo)
+  void ask(account_name administrator, account_name contract, string task, string memo, string args)
   {
     require_auth(administrator);
     auto itt = requests.find(pack_hash(get_hash(task, contract)));
@@ -84,6 +85,8 @@ public:
     requests.emplace(administrator, [&](request &r) {
       r.task = task;
       r.contract = contract;
+      r.memo = memo;
+      r.args = args;
       r.timestamp = now();
       r.active = true;
     });
