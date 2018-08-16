@@ -11,9 +11,12 @@
     "generate": "yarn prepare && node generator/lib/index.js"
   },
   "dependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
     "dot": "^1.1.2",
     "eosic": "file:../eosic",
-    "eosjs": "^15.0.6"
+    "eosjs": "^15.0.6",
+    "typescript": "^3.0.1"
   },
   "devDependencies": {
     "@types/dot": "^1.1.2",
