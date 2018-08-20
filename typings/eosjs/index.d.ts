@@ -167,7 +167,10 @@ declare module "eosjs" {
       memo: string,
       callback: (err: any, res: any) => void
     ): void;
-    transfer: EosMehod<{ from: string; to: string; quantity: string; memo: string }, any>;
+    transfer: EosMehod<
+      { from: string; to: string; quantity: string; memo: string },
+      any
+    >;
     // contract(...args: any[]): any
     contract<T extends IEosContract>(
       name: string,
@@ -185,7 +188,7 @@ declare module "eosjs" {
     ): Promise<T>;
   }
   export class IEosjsCallsParams {
-    authorization?: string;
+    authorization?: string | string[];
     sign?: boolean;
   }
   export class IEosContract {
