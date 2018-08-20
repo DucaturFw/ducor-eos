@@ -7,8 +7,8 @@
     "compile": "eosic compile",
     "migrate": "eosic migrate",
     "start": "eosic start",
-    "prepare": "tsc && node generator/lib/prepare.js",
-    "generate": "yarn prepare && node generator/lib/index.js"
+    "prepare": "tsc && node generator/prepare.js",
+    "generate": "yarn prepare && node generator/index.js"
   },
   "dependencies": {
     "@types/chai": "^4.1.4",

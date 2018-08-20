@@ -1,4 +1,4 @@
-# EOS-playground
+# Ducor EOS contracts
 
 The easiest way to start develop smart contracts in the EOS Blockchain with Docker
 
@@ -19,7 +19,6 @@ docker volume create keosd-data-volume
 
 # latest example EOS smart contracts
 svn export https://github.com/eosio/eos.git/trunk/contracts playground/contracts
-
 ```
 
 You can customize which commands to run at startup in the EOS playground environment
