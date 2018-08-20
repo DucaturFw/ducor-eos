@@ -10,5 +10,4 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dot = __importStar(require("dot"));
 const path = __importStar(require("path"));
 dot.templateSettings.strip = false;
-dot.process({ path: path.resolve(__dirname, "../templates") });
-//# sourceMappingURL=prepare.js.map
+dot.process({ path: path.resolve(__dirname, "./templates") });
