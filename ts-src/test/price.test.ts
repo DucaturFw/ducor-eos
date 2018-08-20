@@ -1,14 +1,13 @@
 import * as eosic from "eosic";
-import Eos, { IEosContract, Name } from "eosjs";
+import Eos, { IEosContract, Name, IEosjsCallsParams } from "eosjs";
 import { assert } from "chai";
 import "mocha";
 
 interface IPriceOraclizeContract extends IEosContract {
   setup(
     administrator: Name,
-    oracle: Name,
     master: Name,
-    config: any
+    extra?: IEosjsCallsParams
   ): Promise<any>;
 }
 
@@ -19,8 +18,20 @@ interface IRequest {
   timestamp: number;
   active: number;
 }
+interface IOracles {
+  account: Name;
+}
 
-interface IMasterContract extends IEosContract {}
+interface IMasterContract extends IEosContract {
+  push(
+    oracle: Name,
+    contract: Name,
+    task: string,
+    memo: string,
+    data: Buffer,
+    extra?: IEosjsCallsParams
+  ): Promise<any>;
+}
 
 describe("priceoraclize", () => {
   let masterAccount: Name, masterContract: IMasterContract;
@@ -32,10 +43,8 @@ describe("priceoraclize", () => {
     "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
   ];
 
-  const ethbtc_id =
-    "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5";
-  const eoseth_id =
-    "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347";
+  const nullsbnb_id =
+    "0xae1cb3a8b6b4c49c65d22655c1ec4d28a4b3819065dd6aaf990d18e7ede951f1";
 
   const eos = Eos({
     httpEndpoint: "http://0.0.0.0:8888",
@@ -46,7 +55,7 @@ describe("priceoraclize", () => {
     ({
       account: masterAccount,
       contract: masterContract
-    } = await eosic.createContract(pub, eos, "masteroracle"));
+    } = await eosic.createContract<IMasterContract>(pub, eos, "masteroracle"));
     ({
       account: oraclizeAccount,
       contract: oraclizeContract
@@ -64,8 +73,9 @@ describe("priceoraclize", () => {
 
     oracle = `${pid}oracle`;
     await eosic.createAccount(eos, pub, oracle);
+    await eosic.allowContract(eos, masterAccount, pub, masterAccount);
     await eosic.allowContract(eos, oraclizeAccount, pub, oraclizeAccount);
-    await oraclizeContract.setup(oraclizeAccount, oracle, masterAccount, {
+    await oraclizeContract.setup(oraclizeAccount, masterAccount, {
       authorization: [oraclizeAccount]
     });
   });
@@ -76,18 +86,67 @@ describe("priceoraclize", () => {
       scope: masterAccount,
       table: "request",
       json: true,
-      limit: 999
+      limit: 9999
     });
 
-    assert.equal(requests.rows.length, 2, "Unexpected amount of requests");
+    assert.equal(requests.rows.length, 1, "Unexpected amount of requests");
     console.log(requests.rows);
     assert.isTrue(
-      requests.rows.some(el => el.task === eoseth_id),
+      requests.rows.some(el => el.task === nullsbnb_id),
       "Unexpected task in first request"
     );
-    assert.isTrue(
-      requests.rows.some(el => el.task === ethbtc_id),
-      "Unexpected task in second request"
+  });
+
+  it("no oracles by default", async () => {
+    const oracles = await eos.getTableRows<IOracles>({
+      code: masterAccount,
+      scope: masterAccount,
+      table: "oracles",
+      json: true,
+      limit: 9999
+    });
+
+    assert.lengthOf(oracles.rows, 0, "Not empty list of oracles");
+  });
+
+  it("add oracle", async () => {
+    await masterContract.addoracle(oracle, {
+      authorization: masterAccount
+    });
+
+    const oracles = await eos.getTableRows<IOracles>({
+      code: masterAccount,
+      scope: masterAccount,
+      table: "oracles",
+      json: true,
+      limit: 9999
+    });
+
+    assert.lengthOf(oracles.rows, 1, "Not empty list of oracles");
+    assert.equal(oracles.rows[0].account, oracle, "Unkown oracle");
+  });
+
+  it("oraclize", async () => {
+    const price = {
+      value: 200000,
+      decimals: 4
+    };
+
+    const priceBinary = masterContract.fc.toBuffer("price", price);
+
+    await masterContract.addoracle(oracle, {
+      authorization: masterAccount
+    });
+
+    await masterContract.push(
+      oracle,
+      oraclizeAccount,
+      "0xae1cb3a8b6b4c49c65d22655c1ec4d28a4b3819065dd6aaf990d18e7ede951f1",
+      "",
+      priceBinary,
+      {
+        authorization: oracle
+      }
     );
   });
 });

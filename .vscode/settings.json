@@ -58,6 +58,7 @@
     "limits": "cpp",
     "ratio": "cpp",
     "scoped_allocator": "cpp",
-    "type_traits": "cpp"
+    "type_traits": "cpp",
+    "future": "cpp"
   }
 }
