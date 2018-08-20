@@ -1,11 +1,23 @@
 #include <string>
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/action.hpp>
 #include <eosiolib/singleton.hpp>
 #include <eosiolib/time.hpp>
 #include <eosiolib/system.h>
 
 using namespace eosio;
 using std::string;
+
+struct push_data
+{
+  account_name oracle;
+  account_name contract;
+  string task;
+  string memo;
+  bytes data;
+
+  EOSLIB_SERIALIZE(push_data, (oracle)(contract)(task)(memo)(data))
+};
 
 template <uint64_t OraclizeName, uint32_t BestBeforeOffset, uint32_t UpdateOffset, typename T>
 class oraclized
@@ -45,6 +57,11 @@ public:
   bool fresh()
   {
     return exists() && get().best_before > now();
+  }
+
+  bool require_update()
+  {
+    return exists() && get().update_after < now();
   }
 
   T value()
@@ -103,66 +120,115 @@ struct price
   EOSLIB_SERIALIZE(price, (value)(decimals))
 };
 
-typedef oraclized<N(ethbtc), 84600, 3600, price> ethbtc_data;
-typedef oraclized<N(eoseth), 84600, 3600, price> eoseth_data;
-typedef singleton<N(master), account_name> oraclize_master;
+typedef oraclized<N(nulsbnb), 84600, 3600, price> nulsbnb_data;
+typedef singleton<N(master), account_name> account_master;
 
-class YOUR_CONTRACT_NAME : public eosio::contract
+class priceoraclized : public eosio::contract
 {
 private:
-  ethbtc_data ethbtc;
-  eoseth_data eoseth;
-
-  account_name master;
+  nulsbnb_data nulsbnb;
+  account_name known_master;
 
 public:
   using contract::contract;
 
-  YOUR_CONTRACT_NAME(account_name s) : contract(s), ethbtc(_self, _self), eoseth(_self, _self)
+  priceoraclized(account_name s) : contract(s), nulsbnb(_self, _self)
   {
-    master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
+    known_master = account_master(_self, _self).get_or_create(_self, N(undefined));
   }
 
-  // setup method 1
-  void setup(account_name administrator, account_name master, account_name registry)
+  void receive(account_name self, account_name code)
   {
-    require_auth(_self);
-    oraclize_master(_self, _self).set(master, _self);
-    ask_data(administrator, registry, "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5", "custom-memo", "");
-    ask_data(administrator, registry, "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347", string(), "foo;bar");
+    eosio_assert(code == known_master, "Unkown master contract");
+    auto payload = unpack_action_data<push_data>();
+
+    if (strcmp(payload.task.c_str(), "0xae1cb3a8b6b4c49c65d22655c1ec4d28a4b3819065dd6aaf990d18e7ede951f1") == 0)
+    {
+      price p = unpack<price>(payload.data);
+      nulsbnb.set(p, _self);
+      eosio::print("Receive NULS/BNB price: \n");
+      eosio::print("\n  value: ", p.value);
+      eosio::print("\n  decimals: ", uint64_t(p.decimals));
+      return;
+    }
+
+    eosio_assert(true, "Unknown task received");
   }
 
-  void ask_data(account_name administrator, account_name registry, string data, string memo, string args)
+  void ask_data(account_name administrator,
+                account_name registry,
+                string data,
+                string memo,
+                bytes args)
   {
     action(permission_level{administrator, N(active)},
            registry, N(ask),
-           std::make_tuple(administrator, _self, data, memo, args))
+           std::make_tuple(administrator, _self, data, 3600u, memo, args))
         .send();
   }
 
-  void pushprice(account_name oracle, string data_id, string memo, price data)
+  // @abi action
+  void setup(account_name administrator, account_name master)
   {
-    require_auth(oracle);
-
-    if (strcmp(data_id.c_str(), "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5") == 0)
-    {
-      ethbtc.set(data, _self);
-    }
-    if (strcmp(data_id.c_str(), "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347") == 0)
-    {
-      eoseth.set(data, _self);
-    }
+    require_auth(_self);
+    account_master(_self, _self).set(master, _self);
+    ask_data(administrator,
+             master,
+             "0xae1cb3a8b6b4c49c65d22655c1ec4d28a4b3819065dd6aaf990d18e7ede951f1",
+             string(),
+             bytes());
   }
 
   // @abi action
-  void sell(account_name buyer, uint64_t amount)
+  void interact(uint64_t amount)
   {
-    eosio_assert(ethbtc.fresh(), "btcusd data is out dated.");
-    eosio_assert(eoseth.fresh(), "btcptice data is out dated.");
-    eosio::print("\n");
-    eosio::print("\n eth: ", amount * ethbtc.value().value);
-    eosio::print("\n eos: ", amount * eoseth.value().value);
+    eosio_assert(nulsbnb.exists(), "nulsbnb data didn't pushed yet");
+    eosio_assert(nulsbnb.fresh(), "nulsbnb data has been outdated");
+
+    // get newest oraclized price
+    price current_nulsbnb = nulsbnb.value();
+    eosio_assert(current_nulsbnb.value <= 4100000, "Oraclized price lower than predefined 0.041 BTC per ETH threshold");
+    eosio_assert(current_nulsbnb.decimals == 8, "Unexpected oraclized price tolerance");
+    if (nulsbnb.require_update())
+    {
+      eosio::print("Oraclized data is fresh enough, but awaiting for coming update");
+    }
+
+    auto oraclize_record = nulsbnb.get();
+
+    // same as nulsbnb.fresh()
+    eosio_assert(oraclize_record.best_before <= now(), "nulsbnb data has been outdated");
+    // same as nulsbnb.require_update()
+    if (oraclize_record.update_after <= now())
+    {
+      eosio::print("Oraclized data is fresh enough, but awaiting for coming update");
+    }
+
+    eosio::print("\n ETH/BTC price is: ", current_nulsbnb.value);
   }
 };
 
-EOSIO_ABI(YOUR_CONTRACT_NAME, (sell)(setup)(pushprice))
+extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
+{
+  uint64_t self = receiver;
+  if (action == N(onerror))
+  {
+    /* onerror is only valid if it is for the "eosio" code account and authorized by "eosio"'s "active permission */
+    eosio_assert(code == N(eosio), "onerror action's are only valid from the \"eosio\" system account");
+  }
+
+  priceoraclized thiscontract(self);
+
+  if (code == self || action == N(onerror))
+  {
+    switch (action)
+    {
+      EOSIO_API(priceoraclized, (setup)(interact))
+    }
+  }
+
+  if (code != N(self) && action == N(push))
+  {
+    thiscontract.receive(receiver, code);
+  }
+}
