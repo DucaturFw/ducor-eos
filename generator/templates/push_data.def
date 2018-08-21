@@ -1,3 +1,9 @@
+// @abi table args i64
+struct request_args
+{
+  bytes schema;
+  bytes args;
+};
 // carbon-copy call structure
 struct push_data
 {

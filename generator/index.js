@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const oraclized = require("./templates/oraclized");
+const oraclized = require("./templates/eosgenerator");
 console.log(oraclized({
     customs: [
         {

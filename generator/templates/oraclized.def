@@ -1,4 +1,3 @@
-
 template <uint64_t OraclizeName, uint32_t BestBeforeOffset, uint32_t UpdateOffset, typename T>
 class oraclized
 {
