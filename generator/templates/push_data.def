@@ -1,0 +1,17 @@
+// @abi table args i64
+struct request_args
+{
+  bytes schema;
+  bytes args;
+};
+// carbon-copy call structure
+struct push_data
+{
+  account_name oracle;
+  account_name contract;
+  string task;
+  string memo;
+  bytes data;
+
+  EOSLIB_SERIALIZE(push_data, (oracle)(contract)(task)(memo)(data))
+};

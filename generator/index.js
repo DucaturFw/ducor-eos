@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const oraclized = require("../templates/oraclized");
+const oraclized = require("./templates/eosgenerator");
 console.log(oraclized({
     customs: [
         {
@@ -13,7 +13,7 @@ console.log(oraclized({
     ],
     providers: [
         {
-            id: "0xa171dc074ec6e8322d342075684229733fc8d05c97cae16c031249a04998b874",
+            id: "0x00",
             name: "ethbtc",
             alias: "ethbtc",
             type: "price",
@@ -21,14 +21,20 @@ console.log(oraclized({
             updateAfter: 3600
         },
         {
-            id: "0xa171dc074ec6e8322d342075684229733fc8d05c97cae16c031249a04998b874",
+            id: "0x01",
             name: "eoseth",
             alias: "eoseth",
             type: "price",
             bestBefore: 84600,
             updateAfter: 3600
+        },
+        {
+            id: "0x02",
+            name: "random",
+            alias: "random",
+            type: "uint64_t",
+            bestBefore: 84600,
+            updateAfter: 3600
         }
-    ],
-    endpoints: [{ suffix: "price", type: "price" }]
+    ]
 }));
-//# sourceMappingURL=index.js.map

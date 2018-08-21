@@ -1,10 +1,12 @@
+#include <string>
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/action.hpp>
 #include <eosiolib/singleton.hpp>
 #include <eosiolib/time.hpp>
 #include <eosiolib/system.h>
 
 using namespace eosio;
-
+using std::string;
 template <uint64_t OraclizeName, uint32_t BestBeforeOffset, uint32_t UpdateOffset, typename T>
 class oraclized
 {
@@ -43,6 +45,11 @@ public:
   bool fresh()
   {
     return exists() && get().best_before > now();
+  }
+
+  bool require_update()
+  {
+    return exists() && get().update_after < now();
   }
 
   T value()
@@ -93,6 +100,24 @@ public:
   }
 };
 
+// @abi table args i64
+struct request_args
+{
+  bytes schema;
+  bytes args;
+};
+// carbon-copy call structure
+struct push_data
+{
+  account_name oracle;
+  account_name contract;
+  string task;
+  string memo;
+  bytes data;
+
+  EOSLIB_SERIALIZE(push_data, (oracle)(contract)(task)(memo)(data))
+};
+
 struct price
 {
   uint64_t value;
@@ -101,66 +126,99 @@ struct price
   EOSLIB_SERIALIZE(price, (value)(decimals))
 };
 
-typedef oraclized<N(ethbtc), 84600, 3600, price> ethbtc_data;
-typedef oraclized<N(eoseth), 84600, 3600, price> eoseth_data;
-typedef singleton<N(master), account_name> oraclize_master;
+// @abi table ethbtc i64
+struct ethbtc
+{
+  uint32_t best_before;
+  uint32_t update_after;
+  price value;
+
+  EOSLIB_SERIALIZE(ethbtc, (best_before)(update_after)(value))
+};
+
+typedef oraclized<N(ethbtc), 11, 10, price> ethbtc_data;
+
+typedef singleton<N(master), account_name> account_master;
 
 class YOUR_CONTRACT_NAME : public eosio::contract
 {
 private:
   ethbtc_data ethbtc;
-  eoseth_data eoseth;
 
-  account_name master;
+  account_name known_master;
 
 public:
   using contract::contract;
 
-  YOUR_CONTRACT_NAME(account_name s) : contract(s), ethbtc(_self, _self), eoseth(_self, _self)
+  YOUR_CONTRACT_NAME(account_name s) : contract(s), ethbtc(_self, _self)
   {
-    master = oraclize_master(_self, _self).get_or_create(_self, N(undefined));
+    known_master = account_master(_self, _self).get_or_create(_self, N(undefined));
   }
 
-  // setup method 1
-  void setup(account_name administrator, account_name master, account_name registry)
+  void receive(account_name self, account_name code)
   {
-    require_auth(_self);
-    oraclize_master(_self, _self).set(master, _self);
-    ask_data(administrator, registry, "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5");
-    ask_data(administrator, registry, "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347");
-  }
+    eosio_assert(known_master != N(undefined), "Contract didn't setupped yet");
+    eosio_assert(code == known_master, "Unkown master contract");
+    auto payload = unpack_action_data<push_data>();
 
-  void ask_data(account_name administrator, account_name registry, std::string data)
-  {
-    action(permission_level{administrator, N(active)},
-           registry, N(ask),
-           std::make_tuple(administrator, _self, data))
-        .send();
-  }
-
-  void pushprice(account_name oracle, std::string data_id, price data)
-  {
-    require_auth(oracle);
-
-    if (strcmp(data_id.c_str(), "363e7fe8b47534460fd06dafd5e18a542fe1aaa78038d7ca5e84694f99a788e5") == 0)
+    if (strcmp(payload.task.c_str(), "c0fe86756e446503eed0d3c6a9be9e6276018fead3cd038932cf9cc2b661d9de") == 0)
     {
-      ethbtc.set(data, _self);
+      price p = unpack<price>(payload.data);
+      ethbtc.set(p, _self);
+      return;
     }
-    if (strcmp(data_id.c_str(), "36f7c5776d9de47314b73961dbc5afe691e66817b2eae3c1260feefbab131347") == 0)
-    {
-      eoseth.set(data, _self);
-    }
+
+    eosio_assert(true, "Unknown task received");
   }
 
   // @abi action
-  void sell(account_name buyer, uint64_t amount)
+  void setup(account_name master)
   {
-    eosio_assert(ethbtc.fresh(), "btcusd data is out dated.");
-    eosio_assert(eoseth.fresh(), "btcptice data is out dated.");
-    eosio::print("\n");
-    eosio::print("\n eth: ", amount * ethbtc.value().value);
-    eosio::print("\n eos: ", amount * eoseth.value().value);
+    require_auth(_self);
+    account_master(_self, _self).set(master, _self);
+    ask_data(_self, master, "c0fe86756e446503eed0d3c6a9be9e6276018fead3cd038932cf9cc2b661d9de", 10u,
+             string(),
+             pack(request_args{
+                 bytes{},
+                 bytes{}}));
+  }
+
+  void ask_data(account_name administrator,
+                account_name registry,
+                string data,
+                uint32_t update_each,
+                string memo,
+                bytes args)
+  {
+    action(permission_level{administrator, N(active)},
+           registry, N(ask),
+           std::make_tuple(administrator, _self, data, update_each, memo, args))
+        .send();
   }
 };
 
-EOSIO_ABI(YOUR_CONTRACT_NAME, (sell)(setup)(pushprice))
+extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
+{
+  uint64_t self = receiver;
+  if (action == N(onerror))
+  {
+    /* onerror is only valid if it is for the "eosio" code account and authorized by "eosio"'s "active permission */
+    eosio_assert(code == N(eosio), "onerror action's are only valid from the \"eosio\" system account");
+  }
+
+  YOUR_CONTRACT_NAME thiscontract(self);
+
+  if (code == self || action == N(onerror))
+  {
+    switch (action)
+    {
+      // NB: Add custom method in bracets after (setup) to use them as endpoints
+      EOSIO_API(YOUR_CONTRACT_NAME, (setup))
+    }
+  }
+
+  if (code != N(self) && action == N(push))
+  {
+    thiscontract.receive(receiver, code);
+  }
+}

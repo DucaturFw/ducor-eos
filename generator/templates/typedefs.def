@@ -1,0 +1,2 @@
+{{~ it.providers :p }}
+typedef oraclized<N({{= p.alias }}), {{= p.bestBefore }}, {{= p.updateAfter }}, {{= p.type }}> {{= p.name }}_data;{{~}}

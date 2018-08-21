@@ -1,0 +1,11 @@
+{{~ it.providers :p }}
+// @abi table {{= p.alias}} i64
+struct {{= p.alias}}
+{
+  uint32_t best_before;
+  uint32_t update_after;
+  {{= p.type }} value;
+
+  EOSLIB_SERIALIZE({{= p.alias}}, (best_before)(update_after)(value))
+};
+{{~}}

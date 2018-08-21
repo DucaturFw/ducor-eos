@@ -1,0 +1,9 @@
+#include <string>
+#include <eosiolib/eosio.hpp>
+#include <eosiolib/action.hpp>
+#include <eosiolib/singleton.hpp>
+#include <eosiolib/time.hpp>
+#include <eosiolib/system.h>
+
+using namespace eosio;
+using std::string;

@@ -1,35 +1,34 @@
 export interface IFieldConfguration {
-  type: string
-  name: string
+  type: string;
+  name: string;
 }
 
 export interface IEndpointConfiguration {
-  suffix: string
-  type: string
+  suffix: string;
+  type: string;
 }
 
 export interface IDataProviderConfiguration {
-  id: string
-  name: string
-  alias: string
-  type: string
-  bestBefore: number
-  updateAfter: number
+  id: string;
+  name: string;
+  alias: string;
+  type: string;
+  bestBefore: number;
+  updateAfter: number;
 }
 
 export interface ICustomTypeConfiguration {
-  name: string
-  fields?: IFieldConfguration[]
+  name: string;
+  fields?: IFieldConfguration[];
 }
 export interface IEOSGeneratorConfiguration {
-  customs?: ICustomTypeConfiguration[]
-  providers?: IDataProviderConfiguration[]
-  endpoints?: IEndpointConfiguration[]
+  customs?: ICustomTypeConfiguration[];
+  providers?: IDataProviderConfiguration[];
 }
 
-const oraclized = require("../templates/oraclized") as (
+const oraclized = require("./templates/eosgenerator") as (
   config: IEOSGeneratorConfiguration
-) => string
+) => string;
 
 console.log(
   oraclized({
@@ -44,8 +43,7 @@ console.log(
     ],
     providers: [
       {
-        id:
-          "0xa171dc074ec6e8322d342075684229733fc8d05c97cae16c031249a04998b874",
+        id: "0x00",
         name: "ethbtc",
         alias: "ethbtc",
         type: "price",
@@ -53,15 +51,21 @@ console.log(
         updateAfter: 3600
       },
       {
-        id:
-          "0xa171dc074ec6e8322d342075684229733fc8d05c97cae16c031249a04998b874",
+        id: "0x01",
         name: "eoseth",
         alias: "eoseth",
         type: "price",
         bestBefore: 84600,
         updateAfter: 3600
+      },
+      {
+        id: "0x02",
+        name: "random",
+        alias: "random",
+        type: "uint64_t",
+        bestBefore: 84600,
+        updateAfter: 3600
       }
-    ],
-    endpoints: [{ suffix: "price", type: "price" }]
+    ]
   })
-)
+);

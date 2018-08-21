@@ -1,0 +1,65 @@
+{{#def.includes}}
+{{#def.oraclized}}
+{{#def.push_data}}
+{{#def.custom_types}}
+{{#def.tables}}
+{{#def.typedefs}}
+
+typedef singleton<N(master), account_name> account_master;
+
+class YOUR_CONTRACT_NAME : public eosio::contract
+{
+private:
+{{#def.fields}}
+
+  account_name known_master;
+
+public:
+  using contract::contract;
+
+  YOUR_CONTRACT_NAME(account_name s) : contract(s){{~ it.providers :p }}, {{= p.name }}(_self, _self){{~}}
+  {
+    known_master = account_master(_self, _self).get_or_create(_self, N(undefined));
+  }
+
+  void receive(account_name self, account_name code)
+  {
+    eosio_assert(known_master != N(undefined), "Contract didn't setupped yet");
+    eosio_assert(code == known_master, "Unkown master contract");
+    auto payload = unpack_action_data<push_data>();
+
+    {{#def.receivers}}
+
+    eosio_assert(true, "Unknown task received");
+  }
+
+  // @abi action
+  void setup(account_name master)
+  {
+    require_auth(_self);
+    account_master(_self, _self).set(master, _self);
+    {{~ it.providers :p}}ask_data(_self, master, "{{= p.id }}", {{= p.updateAfter }}u,
+             string(),
+             pack(request_args{
+                 bytes{},
+                 bytes{}
+              }));
+    {{~}}
+  }
+
+  void ask_data(account_name administrator,
+                account_name registry,
+                string data,
+                uint32_t update_each,
+                string memo,
+                bytes args)
+  {
+    action(permission_level{administrator, N(active)},
+           registry, N(ask),
+           std::make_tuple(administrator, _self, data, update_each, memo, args))
+        .send();
+  }
+};
+
+
+{{#def.extern}}

@@ -1,0 +1,25 @@
+extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
+{
+  uint64_t self = receiver;
+  if (action == N(onerror))
+  {
+    /* onerror is only valid if it is for the "eosio" code account and authorized by "eosio"'s "active permission */
+    eosio_assert(code == N(eosio), "onerror action's are only valid from the \"eosio\" system account");
+  }
+
+  YOUR_CONTRACT_NAME thiscontract(self);
+
+  if (code == self || action == N(onerror))
+  {
+    switch (action)
+    {
+      // NB: Add custom method in bracets after (setup) to use them as endpoints
+      EOSIO_API(YOUR_CONTRACT_NAME, (setup))
+    }
+  }
+
+  if (code != N(self) && action == N(push))
+  {
+    thiscontract.receive(receiver, code);
+  }
+}

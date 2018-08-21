@@ -1,8 +1,3 @@
-#include <eosiolib/eosio.hpp>
-#include <eosiolib/multi_index.hpp>
-#include <eosiolib/time.hpp>
-#include <eosiolib/system.h>
-
 template <uint64_t OraclizeName, uint32_t BestBeforeOffset, uint32_t UpdateOffset, typename T>
 class oraclized
 {
@@ -41,6 +36,11 @@ public:
   bool fresh()
   {
     return exists() && get().best_before > now();
+  }
+
+  bool require_update()
+  {
+    return exists() && get().update_after < now();
   }
 
   T value()
