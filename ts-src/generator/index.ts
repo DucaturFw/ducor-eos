@@ -26,7 +26,7 @@ export interface IEOSGeneratorConfiguration {
   providers?: IDataProviderConfiguration[];
 }
 
-const oraclized = require("./templates/oraclized") as (
+const oraclized = require("./templates/eosgenerator") as (
   config: IEOSGeneratorConfiguration
 ) => string;
 

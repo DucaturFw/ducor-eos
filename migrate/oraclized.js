@@ -15,15 +15,9 @@ const eosjs_1 = __importDefault(require("eosjs"));
 let masterAccount, masterContract;
 let oraclizeAccount, oraclizeContract;
 let oracle;
-const [[pub, wif], [pub_oracle, wif_oracle]] = [
-    [
-        "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
-        "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-    ],
-    [
-        "EOS7VZJrhYu1a8gHxzWTmHqUWDiQ2EGDANMLPe26fnZbJxK3Hgt6P",
-        "5HqECDpMfwJcdsUVKgkGQHXy8XBaubqxUnyDcazP9TXvuXQVatx"
-    ]
+const [pub, wif] = [
+    "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
+    "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
 ];
 const nullsbnb_id = "0xae1cb3a8b6b4c49c65d22655c1ec4d28a4b3819065dd6aaf990d18e7ede951f1";
 const eos = eosjs_1.default({
@@ -43,16 +37,11 @@ async function default_1() {
     } = await eosic.createContract(pub, eos, "priceoraclize", {
         contractName: "priceoracliz"
     }));
-    const charMap = ["a", "b", "c", "d", "e", "f", "g", "h", "k", "l", "m"];
-    const pid = Array(5)
-        .fill(0)
-        .map(() => charMap[Math.floor(Math.random() * charMap.length)])
-        .join("");
-    oracle = `${pid}oracle`;
-    await eosic.createAccount(eos, pub_oracle, oracle);
+    oracle = `oracle`;
+    await eosic.createAccount(eos, pub, oracle);
     await eosic.allowContract(eos, masterAccount, pub, masterAccount);
     await eosic.allowContract(eos, oraclizeAccount, pub, oraclizeAccount);
-    await oraclizeContract.setup(oraclizeAccount, masterAccount, {
+    await oraclizeContract.setup(masterAccount, {
         authorization: [oraclizeAccount]
     });
     await masterContract.addoracle(oracle, {

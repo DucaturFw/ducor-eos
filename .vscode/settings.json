@@ -59,6 +59,7 @@
     "ratio": "cpp",
     "scoped_allocator": "cpp",
     "type_traits": "cpp",
-    "future": "cpp"
+    "future": "cpp",
+    "__tuple": "cpp"
   }
 }

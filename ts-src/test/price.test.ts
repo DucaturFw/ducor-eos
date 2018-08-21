@@ -4,11 +4,7 @@ import { assert } from "chai";
 import "mocha";
 
 interface IPriceOraclizeContract extends IEosContract {
-  setup(
-    administrator: Name,
-    master: Name,
-    extra?: IEosjsCallsParams
-  ): Promise<any>;
+  setup(master: Name, extra?: IEosjsCallsParams): Promise<any>;
 }
 
 interface IRequest {
@@ -75,7 +71,7 @@ describe("priceoraclize", () => {
     await eosic.createAccount(eos, pub, oracle);
     await eosic.allowContract(eos, masterAccount, pub, masterAccount);
     await eosic.allowContract(eos, oraclizeAccount, pub, oraclizeAccount);
-    await oraclizeContract.setup(oraclizeAccount, masterAccount, {
+    await oraclizeContract.setup(masterAccount, {
       authorization: [oraclizeAccount]
     });
   });

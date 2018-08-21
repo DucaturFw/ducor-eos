@@ -45,7 +45,7 @@ describe("priceoraclize", () => {
         await eosic.createAccount(eos, pub, oracle);
         await eosic.allowContract(eos, masterAccount, pub, masterAccount);
         await eosic.allowContract(eos, oraclizeAccount, pub, oraclizeAccount);
-        await oraclizeContract.setup(oraclizeAccount, masterAccount, {
+        await oraclizeContract.setup(masterAccount, {
             authorization: [oraclizeAccount]
         });
     });
