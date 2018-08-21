@@ -1,0 +1,8 @@
+{{~ it.customs :c}}struct {{= c.name}}
+{
+  {{~ c.fields :f}}{{= f.type }} {{= f.name }};
+  {{~}}
+
+  EOSLIB_SERIALIZE({{= c.name }}, {{~ c.fields :f}}({{= f.name }}){{~}})
+};
+{{~}}
