@@ -19,6 +19,18 @@ constexpr uint8_t REPEATABLE_REQUEST = 1;
 constexpr uint8_t ONCE_REQUEST = 2;
 typedef uint8_t request_type;
 
+// @abi table tuple i64
+typedef std::tuple<> args_tupple;
+
+// @abi table args i64
+struct request_args
+{
+  bytes schema;
+  bytes args;
+
+  EOSLIB_SERIALIZE(request_args, (schema)(args))
+};
+
 // @abi table price i64
 struct price
 {
@@ -139,7 +151,7 @@ public:
                 args,
                 administrator,
                 contract,
-                now(),
+                0,
                 update_each,
                 REPEATABLE_REQUEST},
         administrator);
@@ -170,8 +182,8 @@ public:
                 args,
                 administrator,
                 contract,
-                now(),
-                now(),
+                0,
+                0,
                 ONCE_REQUEST},
         administrator);
   }
@@ -185,7 +197,7 @@ public:
     eosio_assert(itt != requests.end(), "Unknown request");
 
     eosio_assert(itt->mode != DISABLED_REQUEST, "Disabled request push");
-    eosio_assert(now() <= itt->timestamp + itt->update_each, "To early to update");
+    eosio_assert(now() >= itt->timestamp + itt->update_each, "Too early to update");
     // carbon-copy call
     require_recipient(itt->contract);
 
