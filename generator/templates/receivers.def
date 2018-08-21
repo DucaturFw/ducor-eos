@@ -1,0 +1,7 @@
+{{~ it.providers :p }}if (strcmp(payload.task.c_str(), "{{= p.id }}") == 0)
+    {
+      {{= p.type }} p = unpack<{{= p.type }}>(payload.data);
+      {{= p.name }}.set(p, _self);
+      return;
+    }
+    {{~}}
