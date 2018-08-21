@@ -1,0 +1,11 @@
+// carbon-copy call structure
+struct push_data
+{
+  account_name oracle;
+  account_name contract;
+  string task;
+  string memo;
+  bytes data;
+
+  EOSLIB_SERIALIZE(push_data, (oracle)(contract)(task)(memo)(data))
+};
