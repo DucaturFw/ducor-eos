@@ -1,0 +1,10 @@
+{{~ it.providers :p}}ask_data(_self, master, "{{= p.id }}", {{= p.updateAfter }}u,
+             string(),
+             {{?p.args.length}}pack(request_args{
+                 // data schema
+                 bytes{{{~ p.args :a:i }}{{?i}}, {{?}}{{= a.type }}{{~}}},
+                 // binary data
+                 pack(
+                   std::make_tuple({{~ p.args :a:i }}{{?i}}, {{?}}{{= a.default }}{{~}})
+                 )}){{?? true }}pack(request_args{bytes{}, bytes{}}){{?}});
+    {{~}}
