@@ -8,6 +8,11 @@ export interface IEndpointConfiguration {
   type: string;
 }
 
+export interface IDataProviderArgumentConfiguration {
+  type: number;
+  default: string;
+}
+
 export interface IDataProviderConfiguration {
   id: string;
   name: string;
@@ -15,12 +20,14 @@ export interface IDataProviderConfiguration {
   type: string;
   bestBefore: number;
   updateAfter: number;
+  args: IDataProviderArgumentConfiguration[];
 }
 
 export interface ICustomTypeConfiguration {
   name: string;
   fields?: IFieldConfguration[];
 }
+
 export interface IEOSGeneratorConfiguration {
   customs?: ICustomTypeConfiguration[];
   providers?: IDataProviderConfiguration[];
@@ -44,27 +51,12 @@ console.log(
     providers: [
       {
         id: "0x00",
-        name: "ethbtc",
-        alias: "ethbtc",
-        type: "price",
+        name: "rnd",
+        alias: "rnd",
+        type: "int",
         bestBefore: 84600,
-        updateAfter: 3600
-      },
-      {
-        id: "0x01",
-        name: "eoseth",
-        alias: "eoseth",
-        type: "price",
-        bestBefore: 84600,
-        updateAfter: 3600
-      },
-      {
-        id: "0x02",
-        name: "random",
-        alias: "random",
-        type: "uint64_t",
-        bestBefore: 84600,
-        updateAfter: 3600
+        updateAfter: 3600,
+        args: []
       }
     ]
   })

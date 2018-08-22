@@ -38,13 +38,7 @@ public:
   {
     require_auth(_self);
     account_master(_self, _self).set(master, _self);
-    {{~ it.providers :p}}ask_data(_self, master, "{{= p.id }}", {{= p.updateAfter }}u,
-             string(),
-             pack(request_args{
-                 bytes{},
-                 bytes{}
-              }));
-    {{~}}
+    {{#def.ask_data}}
   }
 
   void ask_data(account_name administrator,
